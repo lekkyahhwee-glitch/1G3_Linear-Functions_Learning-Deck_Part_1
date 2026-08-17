@@ -1,0 +1,2073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linear Functions and Graphs — Part 1 of 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B3A6B;
+    --ink-soft:#1B2E42;
+    --paper:#F1F7F5;
+    --paper-dim:#E4EEEA;
+    --coral:#2F6FED;
+    --coral-dim:#2557C7;
+    --mint:#17A673;
+    --gold:#38BDF8;
+    --violet:#0D9488;
+    --line:rgba(27,58,107,0.12);
+    --line-dark:rgba(241,247,245,0.16);
+    --paper-on-dark:#F1F7F5;
+
+    --font-display:'Space Grotesk', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+
+    --fs-hero: clamp(2.2rem, 6vw, 4.6rem);
+    --fs-h1: clamp(1.6rem, 3.6vw, 2.5rem);
+    --fs-h2: clamp(1.2rem, 2.1vw, 1.55rem);
+    --fs-body: clamp(0.96rem, 1.1vw, 1.08rem);
+    --fs-label: 0.76rem;
+    --topbar-h: 56px;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; height:100%; }
+  body{
+    font-family:var(--font-body); color:var(--ink); background:var(--paper); overflow:hidden;
+    height:100%; touch-action:manipulation; -webkit-text-size-adjust:100%;
+  }
+  h1,h2,h3,h4{ font-family:var(--font-display); font-weight:700; line-height:1.12; letter-spacing:-0.01em; }
+  ::selection{ background:var(--gold); color:var(--ink); }
+
+  .deck{
+    height:100vh; height:100dvh; overflow-y:scroll; scroll-snap-type:y proximity; scroll-behavior:smooth;
+    -webkit-overflow-scrolling:touch;
+  }
+  .deck::-webkit-scrollbar{ display:none; }
+
+  .slide{
+    min-height:100vh; min-height:100dvh; width:100%;
+    scroll-snap-align:start; scroll-snap-stop:always;
+    position:relative; display:flex; flex-direction:column; justify-content:center;
+    padding: calc(var(--topbar-h) + 4.5vh) 7.5vw calc(6vh + 60px) 7.5vw;
+    overflow:hidden;
+  }
+  .slide.dark{ background:var(--ink); color:var(--paper-on-dark); }
+  .slide.light{ background:var(--paper); color:var(--ink); }
+  .slide.dense{ justify-content:flex-start; padding-top:calc(var(--topbar-h) + 6vh); }
+
+  .content-wrap{ max-width:980px; width:100%; margin:0 auto; }
+
+  .eyebrow{
+    font-family:var(--font-mono); font-size:var(--fs-label); letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--coral); margin-bottom:0.9rem; display:flex; align-items:center; gap:0.5rem;
+  }
+  .slide.dark .eyebrow{ color:var(--gold); }
+  .eyebrow::before{ content:''; width:18px; height:2px; background:currentColor; display:inline-block; }
+
+  h1{ font-size:var(--fs-hero); }
+  h2{ font-size:var(--fs-h1); margin-bottom:1rem; }
+  h3{ font-size:var(--fs-h2); }
+  .lede{ font-size:var(--fs-body); line-height:1.6; opacity:0.86; max-width:640px; }
+
+  .stagger > *{ animation:riseIn 0.55s cubic-bezier(.22,.68,0,1.01) both; }
+  .stagger > *:nth-child(1){ animation-delay:0.02s; }
+  .stagger > *:nth-child(2){ animation-delay:0.08s; }
+  .stagger > *:nth-child(3){ animation-delay:0.14s; }
+  .stagger > *:nth-child(4){ animation-delay:0.2s; }
+  .stagger > *:nth-child(5){ animation-delay:0.26s; }
+  .stagger > *:nth-child(6){ animation-delay:0.32s; }
+  .stagger > *:nth-child(7){ animation-delay:0.38s; }
+  @keyframes riseIn{ from{ opacity:0; transform:translateY(14px);} to{ opacity:1; transform:translateY(0);} }
+
+  /* ---------- Top bar ---------- */
+  .top-bar{
+    position:fixed; top:0; left:0; right:0; height:var(--topbar-h); z-index:100;
+    background:var(--paper); border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:0.7rem; padding:0 3vw;
+  }
+  body.on-dark .top-bar{ background:var(--ink); border-color:var(--line-dark); }
+  .tb-nav-btn{
+    flex-shrink:0; width:38px; height:38px; min-width:40px; min-height:40px; border-radius:50%;
+    border:1px solid var(--line); background:transparent; color:var(--ink);
+    cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1rem;
+    transition:all 0.15s ease;
+  }
+  .tb-nav-btn:hover{ background:var(--coral); color:#fff; border-color:var(--coral); }
+  body.on-dark .tb-nav-btn{ color:var(--paper-on-dark); border-color:var(--line-dark); }
+  .tb-counter{ flex-shrink:0; font-family:var(--font-mono); font-size:0.74rem; display:flex; align-items:center; gap:0.5rem; white-space:nowrap; }
+  .tb-counter .track{ position:relative; width:34px; height:2px; background:var(--line); }
+  body.on-dark .tb-counter .track{ background:var(--line-dark); }
+  .tb-counter .fill{ position:absolute; left:0; top:0; height:2px; background:var(--coral); transition:width 0.4s ease; }
+  .tb-chips{ flex:1 1 auto; display:flex; gap:0.4rem; overflow-x:auto; scrollbar-width:none; padding:0 0.2rem; }
+  .tb-chips::-webkit-scrollbar{ display:none; }
+  .progress-item{
+    flex-shrink:0; display:flex; align-items:center; gap:0.4rem; font-family:var(--font-mono); font-size:0.66rem;
+    background:rgba(27,58,107,0.045); border:1px solid var(--line); border-radius:20px; padding:0.36rem 0.6rem;
+    cursor:pointer; transition:all 0.2s ease; color:var(--ink); white-space:nowrap;
+  }
+  body.on-dark .progress-item{ background:rgba(241,247,245,0.06); border-color:var(--line-dark); color:var(--paper-on-dark); }
+  .progress-item:hover{ border-color:var(--coral); }
+  .progress-item .dot{ width:12px; height:12px; border-radius:50%; border:2px solid var(--coral); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:0.5rem; }
+  body.on-dark .progress-item .dot{ border-color:var(--gold); }
+  .progress-item.complete .dot{ background:var(--mint); border-color:var(--mint); color:#fff; }
+  .progress-item.complete .dot::after{ content:'✓'; }
+  .tb-score{ flex-shrink:0; font-family:var(--font-mono); font-size:0.7rem; background:var(--ink); color:var(--paper-on-dark); border-radius:20px; padding:0.36rem 0.7rem; }
+  body.on-dark .tb-score{ background:var(--gold); color:var(--ink); }
+
+  /* ---------- Title ---------- */
+  .title-tag{ font-family:var(--font-mono); font-size:0.72rem; letter-spacing:0.1em; color:var(--gold); text-transform:uppercase; }
+  .coord-tease{
+    margin-top:2rem; display:inline-flex; align-items:center; gap:1.2rem; background:rgba(241,247,245,0.05);
+    border:1px solid var(--line-dark); border-radius:14px; padding:1.2rem 1.6rem; cursor:pointer; transition:border-color .2s;
+  }
+  .coord-tease:hover{ border-color:var(--coral); }
+  .coord-tease .blip{ font-family:var(--font-mono); font-size:0.85rem; opacity:0.8; }
+  .coord-tease .tag{ background:var(--coral); color:#fff; font-family:var(--font-mono); font-size:0.72rem; padding:0.2rem 0.55rem; border-radius:6px; }
+  .coord-tease .now{ font-family:var(--font-display); font-size:1.6rem; font-weight:700; color:var(--gold); display:none; }
+  .coord-tease.revealed .now{ display:inline; }
+  .coord-tease .reveal-original{ font-family:var(--font-mono); font-size:0.78rem; opacity:0.6; }
+  .coord-tease.revealed .reveal-original{ opacity:1; color:var(--mint); }
+
+  /* ---------- LO list ---------- */
+  .lo-list{ display:flex; flex-direction:column; gap:0.8rem; margin-top:1.6rem; }
+  .lo-item{ display:flex; gap:0.9rem; align-items:flex-start; padding:0.9rem 1rem; background:rgba(27,58,107,0.03); border:1px solid var(--line); border-radius:10px; }
+  body.on-dark .lo-item{ background:rgba(241,247,245,0.05); border-color:var(--line-dark); }
+  .lo-marker{ font-family:var(--font-mono); font-weight:700; color:var(--coral); flex-shrink:0; width:1.4rem; }
+  .lo-text{ font-size:0.96rem; line-height:1.5; }
+  .pace-note{ margin-top:1.6rem; font-family:var(--font-mono); font-size:0.8rem; opacity:0.65; }
+
+  /* ---------- Feature grid (What you'll see on every page) ---------- */
+  .feature-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:1rem; margin-top:1.6rem; }
+  .feature-card{ background:rgba(241,247,245,0.05); border:1px solid var(--line-dark); border-radius:12px; padding:1.2rem; }
+  .slide.light .feature-card{ background:rgba(27,58,107,0.03); border-color:var(--line); }
+  .fc-icon{ font-size:1.6rem; margin-bottom:0.5rem; display:block; }
+  .fc-title{ font-family:var(--font-display); font-weight:700; font-size:0.98rem; margin-bottom:0.4rem; }
+  .fc-body{ font-size:0.84rem; opacity:0.85; line-height:1.5; }
+
+  /* ---------- Hook cards ---------- */
+  .hook-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:1rem; margin-top:1.6rem; }
+  .hook-card{
+    background:rgba(241,247,245,0.05); border:1px solid var(--line-dark); border-radius:12px; padding:1.2rem;
+    cursor:pointer; transition:all .2s ease; position:relative; overflow:hidden;
+  }
+  .slide.light .hook-card{ background:rgba(27,58,107,0.03); border-color:var(--line); }
+  .hook-card:hover{ border-color:var(--coral); transform:translateY(-2px); }
+  .hook-card .hc-icon{ font-size:1.8rem; margin-bottom:0.6rem; display:block; }
+  .hook-card .hc-title{ font-family:var(--font-display); font-weight:700; font-size:1.02rem; margin-bottom:0.4rem; }
+  .hook-card .hc-body{ font-size:0.86rem; opacity:0; max-height:0; overflow:hidden; transition:all .3s ease; line-height:1.5; }
+  .hook-card.open .hc-body{ opacity:0.85; max-height:200px; margin-top:0.5rem; }
+  .hook-card .hc-tap{ font-family:var(--font-mono); font-size:0.68rem; opacity:0.5; margin-top:0.4rem; }
+  .hook-card .hc-verdict{ display:none; font-family:var(--font-mono); font-size:0.7rem; font-weight:700; margin-top:0.5rem; padding:0.2rem 0.5rem; border-radius:6px; }
+  .hook-card.open .hc-verdict{ display:inline-block; }
+  .hc-verdict.yes{ background:rgba(23,166,115,0.18); color:var(--mint); }
+  .hc-verdict.no{ background:rgba(47,111,237,0.18); color:var(--coral); }
+
+  /* ---------- Ratio box / concept box ---------- */
+  .ratio-box{ display:grid; grid-template-columns:1fr 1fr; gap:0; border:1px solid var(--line); border-radius:12px; overflow:hidden; margin:1.4rem 0; max-width:520px; }
+  .ratio-col{ padding:1rem 1.2rem; }
+  .ratio-col:first-child{ border-right:1px solid var(--line); }
+  body.on-dark .ratio-col:first-child{ border-color:var(--line-dark); }
+  .ratio-head{ font-family:var(--font-mono); font-size:0.72rem; opacity:0.6; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.6rem; }
+  .ratio-row{ display:flex; justify-content:space-between; align-items:center; padding:0.4rem 0; font-family:var(--font-mono); font-size:0.9rem; }
+  .ratio-row .op{ color:var(--coral); font-weight:700; }
+  .ratio-row.highlight{ color:var(--mint); font-weight:700; }
+
+  /* ---------- Quadrant sign grid ---------- */
+  .quad-grid{ display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:2px; max-width:280px; margin:1.4rem 0; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--line); }
+  body.on-dark .quad-grid{ border-color:var(--line-dark); background:var(--line-dark); }
+  .quad-cell{ padding:0.9rem 1rem; font-family:var(--font-mono); font-size:0.78rem; text-align:center; background:var(--paper); line-height:1.5; }
+  body.on-dark .quad-cell{ background:var(--ink); }
+  .quad-cell b{ display:block; font-family:var(--font-display); font-size:0.92rem; margin-bottom:0.15rem; }
+
+  /* ---------- Interactive tool cards ---------- */
+  .tool-card{
+    margin-top:1.6rem; background:rgba(27,58,107,0.03); border:1px solid var(--line); border-radius:16px; padding:1.6rem;
+  }
+  body.on-dark .tool-card{ background:rgba(241,247,245,0.05); border-color:var(--line-dark); }
+  .tool-label{ font-family:var(--font-mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--coral); margin-bottom:0.8rem; }
+  body.on-dark .tool-label{ color:var(--gold); }
+  .tool-row{ display:flex; flex-wrap:wrap; gap:1.4rem; align-items:center; }
+  .tool-slider-block{ flex:1 1 220px; min-width:200px; }
+  .tool-slider-block label{ font-size:0.84rem; font-weight:600; display:block; margin-bottom:0.4rem; }
+  .tool-slider-block input[type=range]{ width:100%; accent-color: var(--coral); }
+  .tool-output{ flex:1 1 200px; min-width:190px; background:var(--ink); color:var(--paper-on-dark); border-radius:12px; padding:1rem 1.2rem; font-family:var(--font-mono); }
+  body.on-dark .tool-output{ background:var(--paper); color:var(--ink); }
+  .tool-output .line{ display:flex; justify-content:space-between; padding:0.25rem 0; font-size:0.86rem; gap:0.6rem; }
+  .tool-output .line.total{ border-top:1px dashed rgba(241,247,245,0.25); margin-top:0.4rem; padding-top:0.5rem; font-weight:700; color:var(--gold); }
+  body.on-dark .tool-output .line.total{ border-color:rgba(27,58,107,0.25); color:var(--coral-dim); }
+  .tool-svg-block{ flex:1 1 380px; min-width:320px; display:flex; justify-content:center; }
+  .tool-svg-block svg{ width:100%; max-width:600px; height:auto; }
+  .mini-table{ width:100%; border-collapse:collapse; font-family:var(--font-mono); font-size:0.8rem; margin-top:0.6rem; }
+  .mini-table td, .mini-table th{ border:1px solid rgba(241,247,245,0.2); padding:0.3rem 0.5rem; text-align:center; }
+  body.on-dark .mini-table td, body.on-dark .mini-table th{ border-color:rgba(27,58,107,0.2); }
+  .slide.light .mini-table td, .slide.light .mini-table th{ border-color:var(--line); }
+
+  .note-callout{
+    display:inline-block; font-family:var(--font-mono); font-size:0.74rem; color:var(--coral-dim);
+    background:rgba(47,111,237,0.1); border:1px solid rgba(47,111,237,0.3); border-radius:8px; padding:0.4rem 0.7rem; margin-top:0.6rem;
+  }
+  body.on-dark .note-callout{ color:var(--gold); background:rgba(56,189,248,0.08); border-color:rgba(56,189,248,0.3); }
+
+  /* ---------- Flip-card definitions ---------- */
+  .flip-card-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:1rem; margin:1.4rem 0; }
+  .flip-card{ perspective:1000px; cursor:pointer; height:150px; }
+  .flip-card-inner{ position:relative; width:100%; height:100%; transition:transform 0.5s; transform-style:preserve-3d; }
+  .flip-card.flipped .flip-card-inner{ transform:rotateY(180deg); }
+  .flip-card-front, .flip-card-back{ position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    border-radius:14px; padding:1.1rem; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
+  .flip-card-front{ background:rgba(251,248,241,0.06); border:1px solid var(--line-dark); }
+  .slide.light .flip-card-front{ background:rgba(15,27,46,0.04); border-color:var(--line); }
+  .flip-card-back{ background:var(--mint); color:#fff; transform:rotateY(180deg); }
+  .flip-icon{ font-size:1.3rem; margin-bottom:0.5rem; display:block; }
+  .flip-question{ font-family:var(--font-display); font-weight:700; font-size:0.98rem; line-height:1.3; }
+  .flip-answer{ font-size:0.85rem; line-height:1.5; }
+  .flip-tap-hint{ font-family:var(--font-mono); font-size:0.64rem; opacity:0.6; margin-top:0.6rem; }
+  .flip-card-worked{ height:190px; }
+  .flip-card-worked .flip-card-back{ align-items:flex-start; text-align:left; }
+  .flip-worked-steps{ font-family:var(--font-mono); font-size:0.82rem; line-height:1.6; white-space:pre-line; width:100%; }
+  .flip-card-wide{ max-width:420px; height:170px; }
+
+  /* ---------- Coloured quadrants ---------- */
+  .quad-cell.quad-1{ background:rgba(52,211,153,0.18); }
+  .quad-cell.quad-2{ background:rgba(34,211,238,0.18); }
+  .quad-cell.quad-3{ background:rgba(96,165,250,0.18); }
+  .quad-cell.quad-4{ background:rgba(192,132,252,0.18); }
+  .quad-cell.quad-1 b{ color:#34D399; }
+  .quad-cell.quad-2 b{ color:#22D3EE; }
+  .quad-cell.quad-3 b{ color:#60A5FA; }
+  .quad-cell.quad-4 b{ color:#C084FC; }
+
+  /* ---------- Not-a-function highlight ---------- */
+  .hook-card.not-function-card.open{ background:rgba(239,68,68,0.16); border-color:#EF4444; }
+  .hook-card.not-function-card .hc-verdict.no{ background:rgba(239,68,68,0.25); color:#EF4444; }
+
+  /* ---------- Stacked fractions ---------- */
+  .stacked-frac{ display:inline-flex; flex-direction:column; align-items:center; vertical-align:middle;
+    font-size:0.92em; line-height:1.05; margin:0 0.12em; text-align:center; }
+  .stacked-frac .frac-num{ border-bottom:1.4px solid currentColor; padding:0 0.22em 0.08em; }
+  .stacked-frac .frac-den{ padding:0.08em 0.22em 0; }
+
+  /* ---------- Equation-of-a-line concept components ---------- */
+  .intercept-defs{ display:flex; flex-direction:column; gap:0.6rem; margin-top:1rem; max-width:640px; }
+  .intercept-def{ background:rgba(27,58,107,0.03); border:1px solid var(--line); border-radius:10px; padding:0.8rem 1rem; font-size:0.92rem; line-height:1.5; }
+  body.on-dark .intercept-def{ background:rgba(241,247,245,0.05); border-color:var(--line-dark); }
+  .id-term{ font-weight:700; color:var(--coral-dim); font-family:var(--font-display); }
+  body.on-dark .id-term{ color:var(--gold); }
+
+  .eqn-general{ margin-top:1.2rem; background:rgba(27,58,107,0.03); border:1px solid var(--line); border-radius:14px; padding:1.4rem 1.6rem; max-width:640px; }
+  body.on-dark .eqn-general{ background:rgba(241,247,245,0.05); border-color:var(--line-dark); }
+  .eqn-general-formula{ font-family:var(--font-display); font-weight:800; font-size:1.9rem; text-align:center; margin-bottom:1.1rem; }
+  .eqn-general-rows{ display:flex; flex-direction:column; gap:0.55rem; }
+  .eqn-general-row{ font-size:0.92rem; line-height:1.55; }
+  .eqn-key{ font-family:var(--font-mono); font-weight:700; }
+
+  .worked-example-card{ margin-top:1.4rem; background:rgba(27,58,107,0.03); border:1px solid var(--line); border-radius:16px; padding:1.6rem; }
+  body.on-dark .worked-example-card{ background:rgba(241,247,245,0.05); border-color:var(--line-dark); }
+  .gradient-calc-display{ display:flex; align-items:center; gap:0.4rem; font-family:var(--font-mono); font-size:1.15rem; font-weight:700; }
+  .worked-steps{ font-family:var(--font-mono); font-size:0.92rem; line-height:1.85; white-space:pre-line;
+    background:rgba(27,58,107,0.04); border-radius:8px; padding:0.75rem 0.95rem; }
+  body.on-dark .worked-steps{ background:rgba(241,247,245,0.06); }
+  .q-diagram{ display:flex; justify-content:center; margin:0.9rem 0; }
+  .q-diagram svg{ width:100%; max-width:420px; height:auto; }
+
+  /* ---------- Plot-and-click activities ---------- */
+  .plot-activity{ margin-top:1.4rem; background:rgba(27,58,107,0.03); border:1px solid var(--line); border-radius:16px; padding:1.5rem; }
+  body.on-dark .plot-activity{ background:rgba(241,247,245,0.05); border-color:var(--line-dark); }
+  .plot-instructions{ font-size:0.94rem; line-height:1.55; margin-bottom:0.9rem; }
+  .plot-instructions .target-pill{ display:inline-block; font-family:var(--font-mono); font-size:0.78rem; background:rgba(47,111,237,0.12); color:var(--coral-dim); border:1px solid rgba(47,111,237,0.3); border-radius:6px; padding:0.15rem 0.5rem; margin:0 0.15rem; }
+  body.on-dark .plot-instructions .target-pill{ color:var(--gold); background:rgba(56,189,248,0.1); border-color:rgba(56,189,248,0.3); }
+  .plot-body{ display:flex; flex-wrap:wrap; gap:1.4rem; align-items:flex-start; }
+  .plot-svg-block{ flex:1 1 520px; min-width:400px; display:flex; justify-content:center; }
+  .plot-svg-block svg{ width:100%; max-width:600px; height:auto; cursor:crosshair; touch-action:none; }
+  .plot-status{ flex:1 1 200px; min-width:190px; }
+  .plot-progress{ font-family:var(--font-mono); font-size:0.86rem; background:var(--ink); color:var(--paper-on-dark); border-radius:10px; padding:0.7rem 1rem; }
+  body.on-dark .plot-progress{ background:var(--paper); color:var(--ink); }
+  .plot-progress.done{ color:var(--mint); }
+  body.on-dark .plot-progress.done{ color:var(--mint); }
+  .plot-followup{ margin-top:1.1rem; }
+
+  /* ---------- Fill-table ---------- */
+  .fill-table-wrap{ margin-top:1.2rem; }
+  .fill-table{ width:100%; max-width:420px; border-collapse:collapse; font-family:var(--font-mono); font-size:0.88rem; }
+  .fill-table th, .fill-table td{ border:1px solid var(--line); padding:0.5rem 0.7rem; text-align:center; }
+  body.on-dark .fill-table th, body.on-dark .fill-table td{ border-color:var(--line-dark); }
+  .fill-table th{ font-weight:700; opacity:0.7; }
+  .fill-table input[type=text]{ width:56px; padding:0.35rem; font-family:var(--font-mono); font-size:0.86rem; text-align:center;
+    border-radius:6px; border:1px solid var(--line); background:var(--paper); color:var(--ink); }
+  body.on-dark .fill-table input[type=text]{ background:var(--ink-soft); color:var(--paper-on-dark); border-color:var(--line-dark); }
+  .fill-table input.cell-correct{ border-color:var(--mint); background:rgba(23,166,115,0.12); }
+  .fill-table input.cell-wrong{ border-color:var(--coral); background:rgba(47,111,237,0.12); }
+
+  /* ---------- Gradient gallery ---------- */
+  .gradient-gallery{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:1rem; margin:1.4rem 0; }
+  .grad-card{ background:rgba(27,58,107,0.03); border:1px solid var(--line); border-radius:12px; padding:1rem; }
+  body.on-dark .grad-card{ background:rgba(241,247,245,0.05); border-color:var(--line-dark); }
+  .grad-card svg{ width:100%; height:auto; display:block; margin-bottom:0.6rem; }
+  .gc-title{ font-family:var(--font-display); font-weight:700; font-size:0.92rem; margin-bottom:0.3rem; }
+  .gc-desc{ font-size:0.8rem; line-height:1.45; opacity:0.85; }
+
+  /* ---------- Questions ---------- */
+  .qsection-label{ font-family:var(--font-mono); font-size:0.78rem; text-transform:uppercase; letter-spacing:0.1em; opacity:0.6; margin:1.8rem 0 0.9rem; }
+  .qgrid{ display:flex; flex-direction:column; gap:1rem; }
+  .qblock{ border:1px solid var(--line); border-radius:12px; padding:1.1rem 1.3rem; background:rgba(27,58,107,0.02); transition:border-color .2s; }
+  body.on-dark .qblock{ border-color:var(--line-dark); background:rgba(241,247,245,0.03); }
+  .qblock.solved{ border-color:var(--mint); }
+  .qhead{ display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; }
+  .qtag{ font-family:var(--font-mono); font-size:0.74rem; opacity:0.7; display:flex; align-items:center; gap:0.4rem; }
+  .solved-icon{ display:none; color:var(--mint); font-weight:700; }
+  .qblock.solved .solved-icon{ display:inline; }
+  .hint-btn{
+    font-family:var(--font-mono); font-size:0.7rem; background:transparent; border:1px solid var(--line); border-radius:20px;
+    padding:0.3rem 0.65rem; cursor:pointer; color:inherit; opacity:0.75;
+  }
+  body.on-dark .hint-btn{ border-color:var(--line-dark); }
+  .hint-btn:hover{ border-color:var(--gold); opacity:1; }
+  .qprompt{ font-size:0.96rem; line-height:1.5; margin-bottom:0.7rem; }
+  .hint-box{
+    display:none; font-size:0.84rem; background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.35);
+    border-radius:8px; padding:0.6rem 0.8rem; margin-bottom:0.7rem; line-height:1.45;
+  }
+  .hint-box.show{ display:block; }
+  .mcq-options{ display:flex; flex-wrap:wrap; gap:0.55rem; }
+  .opt-btn{
+    font-family:var(--font-body); font-size:0.88rem; padding:0.55rem 1rem; border-radius:8px; border:1px solid var(--line);
+    background:var(--paper); color:var(--ink); cursor:pointer; transition:all .15s;
+  }
+  body.on-dark .opt-btn{ background:var(--ink-soft); color:var(--paper-on-dark); border-color:var(--line-dark); }
+  .opt-btn:hover{ border-color:var(--coral); }
+  .opt-btn.correct{ background:var(--mint); border-color:var(--mint); color:#fff; }
+  .opt-btn.wrong{ background:var(--coral); border-color:var(--coral); color:#fff; }
+  .opt-btn:disabled{ cursor:default; opacity:0.7; }
+  .numeric-row{ display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; }
+  .numeric-row input[type=text]{
+    width:130px; padding:0.55rem 0.7rem; font-family:var(--font-mono); font-size:0.94rem; border-radius:8px;
+    border:1px solid var(--line); background:var(--paper); color:var(--ink);
+  }
+  body.on-dark .numeric-row input[type=text]{ background:var(--ink-soft); color:var(--paper-on-dark); border-color:var(--line-dark); }
+  .check-btn{
+    font-family:var(--font-display); font-weight:600; font-size:0.85rem; background:var(--ink); color:var(--paper-on-dark);
+    border:none; border-radius:8px; padding:0.55rem 1.1rem; cursor:pointer; transition:transform .12s;
+  }
+  body.on-dark .check-btn{ background:var(--coral); }
+  .check-btn:hover{ transform:translateY(-1px); }
+  .feedback{ margin-top:0.6rem; font-size:0.86rem; font-weight:600; min-height:1.2rem; }
+  .feedback.good{ color:var(--mint); }
+  .feedback.bad{ color:var(--coral-dim); }
+  .scaffold-box{
+    display:none; margin-top:0.8rem; font-family:var(--font-mono); font-size:0.82rem; white-space:pre-line;
+    background:rgba(13,148,136,0.1); border:1px solid rgba(13,148,136,0.35); border-radius:8px; padding:0.7rem 0.9rem; line-height:1.55;
+  }
+  .scaffold-box.show{ display:block; }
+  .qblock.bonus{ border-color:var(--gold); background:rgba(56,189,248,0.06); }
+  .bonus-star{ color:var(--gold); }
+
+  /* ---------- Recap ---------- */
+  .score-banner{ font-family:var(--font-mono); font-size:1.1rem; margin:1rem 0 1.6rem; background:rgba(27,58,107,0.06); display:inline-block; padding:0.7rem 1.2rem; border-radius:10px; }
+  body.on-dark .score-banner{ background:rgba(241,247,245,0.06); }
+  .recap-list{ display:flex; flex-direction:column; gap:0.6rem; max-width:640px; }
+  .recap-item{ display:flex; align-items:center; gap:0.7rem; font-size:0.92rem; padding:0.6rem 0.2rem; border-bottom:1px solid var(--line); }
+  body.on-dark .recap-item{ border-color:var(--line-dark); }
+  .recap-check{ font-family:var(--font-mono); width:1.3rem; text-align:center; color:var(--line); }
+  body.on-dark .recap-check{ color:var(--line-dark); }
+  .recap-check.done{ color:var(--mint); }
+  .next-teaser{ margin-top:1.6rem; font-family:var(--font-mono); font-size:0.86rem; opacity:0.7; }
+
+  /* ---------- Screenshot banner ---------- */
+  .screenshot-banner{
+    background:linear-gradient(135deg, var(--coral), var(--mint));
+    color:#fff; border-radius:20px; padding:2rem 1.8rem; text-align:center; margin-bottom:2rem;
+    animation:pulseGlow 2.2s infinite;
+  }
+  .screenshot-banner .ss-icon{ font-size:3rem; display:block; margin-bottom:0.7rem; }
+  .screenshot-banner h3{ font-family:var(--font-display); font-weight:800; font-size:1.5rem; margin-bottom:0.6rem; color:#fff; }
+  .screenshot-banner p{ font-size:0.98rem; opacity:0.96; max-width:560px; margin:0 auto; line-height:1.55; }
+  @keyframes pulseGlow{
+    0%{ box-shadow:0 0 0 0 rgba(47,111,237,0.5); }
+    70%{ box-shadow:0 0 0 22px rgba(47,111,237,0); }
+    100%{ box-shadow:0 0 0 0 rgba(47,111,237,0); }
+  }
+  .summary-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:1rem; margin-top:1.6rem; }
+  .summary-card{ background:rgba(21,23,43,0.03); border:1px solid var(--line); border-radius:12px; padding:1.1rem 1.2rem; }
+  body.on-dark .summary-card{ background:rgba(251,248,241,0.05); border-color:var(--line-dark); }
+  .summary-card .sc-title{ font-family:var(--font-mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--coral); margin-bottom:0.5rem; }
+  body.on-dark .summary-card .sc-title{ color:var(--gold); }
+  .summary-card .sc-body{ font-size:0.88rem; line-height:1.5; }
+  .summary-card .sc-body p + p{ margin-top:0.7rem; }
+
+  /* ---------- Laser pointer ---------- */
+  .laser-toggle{
+    position:fixed; bottom:16px; right:16px; z-index:500; width:42px; height:42px; border-radius:50%;
+    background:rgba(27,58,107,0.85); border:1px solid rgba(255,255,255,0.25); color:#fff; font-size:1.1rem;
+    cursor:pointer; opacity:0.55; transition:opacity 0.15s; display:flex; align-items:center; justify-content:center;
+  }
+  .laser-toggle.active{ opacity:1; border-color:var(--mint); }
+  .laser-dot{
+    position:fixed; width:20px; height:20px; border-radius:50%; pointer-events:none; z-index:999; display:none;
+    transform:translate(-50%,-50%); background:radial-gradient(circle, rgba(47,111,237,0.95), rgba(47,111,237,0));
+    box-shadow:0 0 18px 6px rgba(47,111,237,0.55);
+  }
+
+  /* ---------- Math symbol toolbar ---------- */
+  .math-toolbar{
+    position:fixed; bottom:0; left:0; right:0; z-index:400; background:rgba(27,58,107,0.96); backdrop-filter:blur(6px);
+    border-top:1px solid rgba(255,255,255,0.14); display:flex; gap:0.35rem; padding:0.5rem 4.5rem 0.5rem 0.7rem;
+    overflow-x:auto; white-space:nowrap;
+  }
+  .math-toolbar::-webkit-scrollbar{ height:4px; }
+  .math-toolbar button{
+    flex-shrink:0; font-family:var(--font-mono); font-size:0.92rem; background:rgba(255,255,255,0.08); color:#fff;
+    border:1px solid rgba(255,255,255,0.16); border-radius:7px; padding:0.35rem 0.65rem; cursor:pointer;
+  }
+  .math-toolbar button:hover{ background:rgba(255,255,255,0.2); }
+  .math-toolbar .mt-label{ flex-shrink:0; font-family:var(--font-mono); font-size:0.66rem; color:rgba(255,255,255,0.4);
+    align-self:center; padding:0 0.2rem; text-transform:uppercase; letter-spacing:0.06em; }
+
+  @media print{ .laser-toggle, .laser-dot, .math-toolbar{ display:none !important; } }
+
+  @media (max-width:640px){
+    .tb-chips{ display:none; }
+    .slide{ padding-left:6vw; padding-right:6vw; }
+  }
+</style>
+</head>
+<body>
+
+<div class="laser-dot" id="laserDot"></div>
+<button class="laser-toggle" id="laserToggle" title="Toggle laser pointer">🔴</button>
+<div class="math-toolbar" id="mathToolbar"></div>
+
+<div class="top-bar" id="topBar">
+  <button class="tb-nav-btn" id="prevBtn" aria-label="previous">←</button>
+  <div class="tb-counter"><span id="slideNum">1</span>/<span id="slideTotal">14</span><span class="track"><span class="fill" id="counterFill"></span></span></div>
+  <div class="tb-chips" id="tbChips"></div>
+  <div class="tb-score" id="tbScore">Score 0/28</div>
+  <button class="tb-nav-btn" id="resetProgressBtn" aria-label="reset progress" title="Reset progress">⟲</button>
+  <button class="tb-nav-btn" id="nextBtn" aria-label="next">→</button>
+</div>
+
+<div class="deck" id="deck">
+
+<!-- SLIDE 1 — TITLE -->
+  <section class="slide dark" id="s1">
+    <div class="content-wrap">
+      <div class="title-tag">Sec 1 · Chapter 11 · Maths Workbook · Part 1 of 3</div>
+      <h1>Linear Functions<br>and Graphs</h1>
+      <p class="lede" style="margin-top:1rem;">Have you ever wondered how so many airplanes fly in the sky without crashing into each other? Air traffic controllers track every plane using coordinates on a grid — the same idea behind every graph you're about to draw.</p>
+      <div class="coord-tease" id="coordTease" onclick="this.classList.toggle('revealed')">
+        <span class="blip">📡 Flight SQ217 is somewhere on the tower's grid —</span>
+        <span class="tag">tap to reveal</span>
+        <span class="now">(7, 4)</span>
+        <span class="reveal-original">← its exact position, as an ordered pair</span>
+      </div>
+    </div>
+  </section>
+<!-- SLIDE 2 — LOs -->
+  <section class="slide light" id="s2">
+    <div class="content-wrap stagger">
+      <div class="eyebrow">Learning objectives</div>
+      <h2>Six skills that build on each other, one grid at a time</h2>
+      <p class="lede">By the end of this workbook, you'll be able to do all six of these — and each section is named to match.</p>
+      <div class="lo-list">
+        <div class="lo-item"><div class="lo-marker">A</div><div class="lo-text">State the coordinates of a point on a two-dimensional Cartesian coordinate system.</div></div>
+        <div class="lo-item"><div class="lo-marker">B</div><div class="lo-text">Plot the graph of a set of ordered pairs as a representation of a relationship between two variables.</div></div>
+        <div class="lo-item"><div class="lo-marker">C</div><div class="lo-text">Recognise a function.</div></div>
+        <div class="lo-item"><div class="lo-marker">D</div><div class="lo-text">Represent linear functions in various forms and draw linear graphs.</div></div>
+        <div class="lo-item"><div class="lo-marker">E</div><div class="lo-text">Find the gradient and y-intercept of linear graphs.</div></div>
+        <div class="lo-item"><div class="lo-marker">F</div><div class="lo-text">Solve problems involving linear functions in real-world contexts.</div></div>
+      </div>
+      <div class="pace-note">⏱️ This is Part 1 of 3. Today's session covers A, B, C and D — we'll continue with E and F over the next couple of sessions.</div>
+    </div>
+  </section>
+<!-- SLIDE 3 — WHAT YOU'LL SEE ON EVERY PAGE -->
+  <section class="slide dark dense" id="s3">
+    <div class="content-wrap">
+      <div class="eyebrow">Before you start</div>
+      <h2>What you'll see on every page</h2>
+      <p class="lede">This workbook works the same way from start to finish. Here's everything you'll run into along the way.</p>
+      <div class="feature-grid stagger">
+        <div class="feature-card">
+          <span class="fc-icon">💡</span>
+          <div class="fc-title">Hint button</div>
+          <div class="fc-body">Stuck on a question? Tap <strong>Hint</strong> for a nudge in the right direction — never the answer itself.</div>
+        </div>
+        <div class="feature-card">
+          <span class="fc-icon">🔓</span>
+          <div class="fc-title">Worked solutions</div>
+          <div class="fc-body">Get a question wrong twice and the full worked solution appears automatically. For the table-fill exercises, you get 3 tries before we show you one row worked through as an example.</div>
+        </div>
+        <div class="feature-card">
+          <span class="fc-icon">🎛️</span>
+          <div class="fc-title">Live interactive tools</div>
+          <div class="fc-body">Sections marked 🎛️ have sliders or draggable values — play with the numbers and watch the graph update instantly.</div>
+        </div>
+        <div class="feature-card">
+          <span class="fc-icon">🖱️</span>
+          <div class="fc-title">Plot-and-click activities</div>
+          <div class="fc-body">Some questions ask you to click directly on a grid to plot a point. You'll get instant feedback on whether you placed it correctly.</div>
+        </div>
+        <div class="feature-card">
+          <span class="fc-icon">✅</span>
+          <div class="fc-title">Progress chips</div>
+          <div class="fc-body">The bar at the top tracks every section. Tap a chip to jump straight there — it turns green once you've completed it.</div>
+        </div>
+        <div class="feature-card">
+          <span class="fc-icon">🏆</span>
+          <div class="fc-title">Score counter</div>
+          <div class="fc-body">Your running score is always visible top-right. Aim to clear every challenge by the end of the workbook.</div>
+        </div>
+        <div class="feature-card">
+          <span class="fc-icon">🔄</span>
+          <div class="fc-title">Flip cards</div>
+          <div class="fc-body">Some definitions and worked examples are hidden behind flip cards. Tap to reveal, tap again to hide.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+<!-- SLIDE 4 — HOOK -->
+  <section class="slide light dense" id="s4">
+    <div class="content-wrap">
+      <div class="eyebrow">Spot the coordinates and graphs</div>
+      <h2>You already meet these four every week. Tap each one.</h2>
+      <div class="hook-grid stagger">
+        <div class="hook-card" onclick="this.classList.toggle('open')">
+          <span class="hc-icon">📡</span>
+          <div class="hc-title">Air traffic control</div>
+          <div class="hc-body">Every plane's position is an ordered pair (x, y) on the controller's radar grid — exactly what you're about to plot and read.</div>
+          <div class="hc-tap">tap to reveal</div>
+        </div>
+        <div class="hook-card" onclick="this.classList.toggle('open')">
+          <span class="hc-icon">🗺️</span>
+          <div class="hc-title">Map grid references</div>
+          <div class="hc-body">"Turn to grid reference (4, 7)" — maps and games use the exact same x-y coordinate idea to pin down a location.</div>
+          <div class="hc-tap">tap to reveal</div>
+        </div>
+        <div class="hook-card" onclick="this.classList.toggle('open')">
+          <span class="hc-icon">🌡️</span>
+          <div class="hc-title">Temperature over time</div>
+          <div class="hc-body">At any single moment, there's exactly one temperature reading — one input (time) always gives one output. That's the idea of a function.</div>
+          <div class="hc-tap">tap to reveal</div>
+        </div>
+        <div class="hook-card" onclick="this.classList.toggle('open')">
+          <span class="hc-icon">📱</span>
+          <div class="hc-title">Phone data plans</div>
+          <div class="hc-body">Cost = a fixed monthly fee + a rate × how much data you use. That's a linear function — a straight-line graph you'll learn to read at a glance.</div>
+          <div class="hc-tap">tap to reveal</div>
+        </div>
+      </div>
+    </div>
+  </section>
+<!-- SLIDE 5 — (A) CARTESIAN COORDINATES concept + tool -->
+  <section class="slide dark dense" id="s5">
+    <div class="content-wrap">
+      <div class="eyebrow">Section A — Cartesian Coordinates</div>
+      <h2>Every point is an ordered pair (x, y)</h2>
+      <p class="lede">The horizontal <strong>x-axis</strong> and vertical <strong>y-axis</strong> cross at the <strong>origin O(0, 0)</strong>. A point's position is written as <strong>(x, y)</strong> — x tells you how far left/right, y tells you how far up/down. The two axes divide the plane into <strong>4 quadrants</strong>.</p>
+
+      <div class="flip-card-grid">
+        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <span class="flip-icon">🔄</span>
+              <p class="flip-question">What is the origin?</p>
+              <span class="flip-tap-hint">tap to reveal</span>
+            </div>
+            <div class="flip-card-back">
+              <p class="flip-answer">The point (0, 0) — where the x-axis and y-axis cross. Every coordinate is measured starting from here.</p>
+              <span class="flip-tap-hint">tap to hide</span>
+            </div>
+          </div>
+        </div>
+        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <span class="flip-icon">🔄</span>
+              <p class="flip-question">What is an ordered pair?</p>
+              <span class="flip-tap-hint">tap to reveal</span>
+            </div>
+            <div class="flip-card-back">
+              <p class="flip-answer">A pair of numbers (x, y) that gives the exact position of a point — x is how far left/right <u>from the origin</u>, y is how far up/down <u>from the origin</u>.</p>
+              <span class="flip-tap-hint">tap to hide</span>
+            </div>
+          </div>
+        </div>
+        <div class="flip-card" onclick="this.classList.toggle('flipped')">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <span class="flip-icon">🔄</span>
+              <p class="flip-question">What is a quadrant?</p>
+              <span class="flip-tap-hint">tap to reveal</span>
+            </div>
+            <div class="flip-card-back">
+              <p class="flip-answer">One of the 4 regions the x-axis and y-axis divide the plane into. Each quadrant has its own sign pattern for x and y.</p>
+              <span class="flip-tap-hint">tap to hide</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quad-grid">
+        <div class="quad-cell quad-2"><b>Quadrant II</b>(−, +)</div>
+        <div class="quad-cell quad-1"><b>Quadrant I</b>(+, +)</div>
+        <div class="quad-cell quad-3"><b>Quadrant III</b>(−, −)</div>
+        <div class="quad-cell quad-4"><b>Quadrant IV</b>(+, −)</div>
+      </div>
+
+      <div class="tool-card">
+        <div class="tool-label">🎛️ Try it — drag the point</div>
+        <div class="tool-row">
+          <div class="tool-slider-block">
+            <label>x = <span id="cartXLbl">3</span></label>
+            <input type="range" id="cartX" min="-6" max="6" step="1" value="3" oninput="updateCartTool()">
+            <label style="margin-top:0.8rem;">y = <span id="cartYLbl">4</span></label>
+            <input type="range" id="cartY" min="-6" max="6" step="1" value="4" oninput="updateCartTool()">
+            <div class="tool-output" style="margin-top:1rem;">
+              <div class="line"><span>Coordinates</span><span id="cartCoordLbl">(3, 4)</span></div>
+              <div class="line total"><span>Location</span><span id="cartQuadLbl">1st Quadrant</span></div>
+            </div>
+          </div>
+          <div class="tool-svg-block">
+            <svg id="cartSvg" viewBox="0 0 350 350"><g id="cart-shade"></g><g id="cart-grid"></g><g id="cart-dyn"></g></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+<!-- SLIDE 6 — (A) practice -->
+  <section class="slide dark dense" id="s6">
+    <div class="content-wrap">
+      <div class="eyebrow">Section A — Practice</div>
+      <h2>Coordinates &amp; quadrants</h2>
+      <div class="qgrid">
+
+        <div class="qblock" id="block-qc1" data-group="cart">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 1</span><button class="hint-btn" data-hint-for="qc1">💡 Hint</button></div>
+          <p class="qprompt">Which quadrant does the point (3, 5) lie in?</p>
+          <div class="hint-box" id="hint-qc1">Is x positive or negative here — and what about y?</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="qc1" data-correct="true">1st Quadrant</button>
+            <button class="opt-btn" data-qid="qc1" data-correct="false">2nd Quadrant</button>
+            <button class="opt-btn" data-qid="qc1" data-correct="false">3rd Quadrant</button>
+            <button class="opt-btn" data-qid="qc1" data-correct="false">4th Quadrant</button>
+          </div>
+          <div class="feedback" id="fb-qc1"></div>
+          <div class="scaffold-box" id="scaffold-qc1">x = 3 (positive)
+y = 5 (positive)
+(+, +)
+1st Quadrant</div>
+        </div>
+
+        <div class="qblock" id="block-qc2" data-group="cart">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 2</span><button class="hint-btn" data-hint-for="qc2">💡 Hint</button></div>
+          <p class="qprompt">Which quadrant does the point (−4, 2) lie in?</p>
+          <div class="hint-box" id="hint-qc2">What are the signs of x and y for this point?</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="qc2" data-correct="false">1st Quadrant</button>
+            <button class="opt-btn" data-qid="qc2" data-correct="true">2nd Quadrant</button>
+            <button class="opt-btn" data-qid="qc2" data-correct="false">3rd Quadrant</button>
+            <button class="opt-btn" data-qid="qc2" data-correct="false">4th Quadrant</button>
+          </div>
+          <div class="feedback" id="fb-qc2"></div>
+          <div class="scaffold-box" id="scaffold-qc2">x = −4 (negative)
+y = 2 (positive)
+(−, +)
+2nd Quadrant</div>
+        </div>
+
+        <div class="qblock" id="block-qc3" data-group="cart">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 3</span><button class="hint-btn" data-hint-for="qc3">💡 Hint</button></div>
+          <p class="qprompt">Which quadrant does the point (−2, −6) lie in?</p>
+          <div class="hint-box" id="hint-qc3">What are the signs of x and y for this point?</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="qc3" data-correct="false">1st Quadrant</button>
+            <button class="opt-btn" data-qid="qc3" data-correct="false">2nd Quadrant</button>
+            <button class="opt-btn" data-qid="qc3" data-correct="true">3rd Quadrant</button>
+            <button class="opt-btn" data-qid="qc3" data-correct="false">4th Quadrant</button>
+          </div>
+          <div class="feedback" id="fb-qc3"></div>
+          <div class="scaffold-box" id="scaffold-qc3">x = −2 (negative)
+y = −6 (negative)
+(−, −)
+3rd Quadrant</div>
+        </div>
+
+        <div class="qblock" id="block-qc4" data-group="cart">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 4</span><button class="hint-btn" data-hint-for="qc4">💡 Hint</button></div>
+          <p class="qprompt">Which quadrant does the point (5, −3) lie in?</p>
+          <div class="hint-box" id="hint-qc4">What are the signs of x and y for this point?</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="qc4" data-correct="false">1st Quadrant</button>
+            <button class="opt-btn" data-qid="qc4" data-correct="false">2nd Quadrant</button>
+            <button class="opt-btn" data-qid="qc4" data-correct="false">3rd Quadrant</button>
+            <button class="opt-btn" data-qid="qc4" data-correct="true">4th Quadrant</button>
+          </div>
+          <div class="feedback" id="fb-qc4"></div>
+          <div class="scaffold-box" id="scaffold-qc4">x = 5 (positive)
+y = −3 (negative)
+(+, −)
+4th Quadrant</div>
+        </div>
+
+        <div class="qblock" id="block-qc5" data-group="cart">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 5</span><button class="hint-btn" data-hint-for="qc5">💡 Hint</button></div>
+          <p class="qprompt">A point is 4 units to the right of the origin, and 3 units below it. What are its coordinates?</p>
+          <div class="hint-box" id="hint-qc5">Moving right of the origin — is that positive or negative x? Moving below it — positive or negative y?</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="qc5" data-correct="true">(4, −3)</button>
+            <button class="opt-btn" data-qid="qc5" data-correct="false">(−4, 3)</button>
+            <button class="opt-btn" data-qid="qc5" data-correct="false">(3, −4)</button>
+            <button class="opt-btn" data-qid="qc5" data-correct="false">(4, 3)</button>
+          </div>
+          <div class="feedback" id="fb-qc5"></div>
+          <div class="scaffold-box" id="scaffold-qc5">4 right → x = 4
+3 below → y = −3
+Coordinates: (4, −3)</div>
+        </div>
+
+        <div class="qblock" id="block-qc6" data-group="cart">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 6</span><button class="hint-btn" data-hint-for="qc6">💡 Hint</button></div>
+          <p class="qprompt">A point lies exactly on the x-axis. What must be true about its y-coordinate?</p>
+          <div class="hint-box" id="hint-qc6">If a point hasn't moved up or down from the x-axis at all, what must its y-coordinate be?</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="qc6" data-correct="true">It must be 0</button>
+            <button class="opt-btn" data-qid="qc6" data-correct="false">It must be 1</button>
+            <button class="opt-btn" data-qid="qc6" data-correct="false">It must equal x</button>
+            <button class="opt-btn" data-qid="qc6" data-correct="false">It can be any value</button>
+          </div>
+          <div class="feedback" id="fb-qc6"></div>
+          <div class="scaffold-box" id="scaffold-qc6">Every point on the x-axis has moved 0 units up or down, so y = 0. E.g. (5, 0), (−2, 0).</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+<!-- SLIDE 7 — (B) PLOT & DRAW concept -->
+  <section class="slide light dense" id="s7">
+    <div class="content-wrap">
+      <div class="eyebrow">Section B — Plotting Points and Drawing a Line</div>
+      <h2>Plot each point, then connect the dots</h2>
+      <p class="lede">To turn a set of ordered pairs into a graph: plot every point the same way you did in Section A — over to its x-value, then up or down to its y-value. If the points come from a <strong>linear</strong> relation, joining them with a ruler always gives a perfectly <strong>straight line</strong>.</p>
+
+      <div class="tool-card">
+        <div class="tool-label">Worked example</div>
+        <div class="tool-row">
+          <div class="tool-slider-block">
+            <p style="font-size:0.9rem; line-height:1.6;">Points (−3, −1), (0, 2), (2, 4) all come from the same relation. Plot each one, then join them in order — they line up perfectly.</p>
+            <div class="note-callout" style="margin-top:0.8rem;">If your three points don't line up, check your plotting before assuming the relation isn't linear.</div>
+          </div>
+          <div class="tool-svg-block">
+            <svg viewBox="0 0 350 350">
+              <g id="example-grid"></g>
+              <line x1="130" y1="190" x2="205" y2="115" stroke="var(--mint)" stroke-width="2" stroke-dasharray="5,4"/>
+              <circle cx="130" cy="190" r="5" style="fill:var(--coral)"/>
+              <circle cx="175" cy="145" r="5" style="fill:var(--coral)"/>
+              <circle cx="205" cy="115" r="5" style="fill:var(--coral)"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="note-callout">Try it yourself on the next page — click directly on the grid to plot each point.</div>
+    </div>
+  </section>
+<!-- SLIDE 8 — (B) practice: plot & connect activities -->
+  <section class="slide light dense" id="s8">
+    <div class="content-wrap">
+      <div class="eyebrow">Section B — Practice 🖱️</div>
+      <h2>Plot the points, then connect them</h2>
+
+      <div class="plot-activity">
+        <div class="plot-instructions">
+          <strong>Activity 1.</strong> These points come from the relation y = 2x + 3. Click the grid to plot: <span class="target-pill">(−4, −5)</span><span class="target-pill">(−1, 1)</span><span class="target-pill">(2, 7)</span> — the line will draw itself once all three are placed.
+        </div>
+        <div class="plot-body">
+          <div class="plot-svg-block"><svg id="plotSvg1" viewBox="0 0 350 350"><g id="plot1-grid"></g><g id="plot1-dyn"></g></svg></div>
+          <div class="plot-status">
+            <div class="plot-progress" id="plot1-progress">0 / 3 points plotted</div>
+          </div>
+        </div>
+        <div class="plot-followup qgrid">
+          <div class="qblock" id="block-b1q" data-group="plotb">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 7</span><button class="hint-btn" data-hint-for="b1q">💡 Hint</button></div>
+            <p class="qprompt">Once connected, what shape do these three points form?</p>
+            <div class="hint-box" id="hint-b1q">If every point comes from the same linear equation, what shape would you expect when you join them up?</div>
+            <div class="mcq-options">
+              <button class="opt-btn" data-qid="b1q" data-correct="true">A straight line</button>
+              <button class="opt-btn" data-qid="b1q" data-correct="false">A curve</button>
+              <button class="opt-btn" data-qid="b1q" data-correct="false">A random scatter</button>
+            </div>
+            <div class="feedback" id="fb-b1q"></div>
+            <div class="scaffold-box" id="scaffold-b1q">Any set of ordered pairs from a linear relation (y = mx + c) will always line up into a straight line.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="plot-activity">
+        <div class="plot-instructions">
+          <strong>Activity 2.</strong> These points come from the relation y = −2x + 2. Click the grid to plot: <span class="target-pill">(−2, 6)</span><span class="target-pill">(0, 2)</span><span class="target-pill">(3, −4)</span>
+        </div>
+        <div class="plot-body">
+          <div class="plot-svg-block"><svg id="plotSvg2" viewBox="0 0 350 350"><g id="plot2-grid"></g><g id="plot2-dyn"></g></svg></div>
+          <div class="plot-status">
+            <div class="plot-progress" id="plot2-progress">0 / 3 points plotted</div>
+          </div>
+        </div>
+        <div class="plot-followup qgrid">
+          <div class="qblock" id="block-b2q" data-group="plotb">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 8</span><button class="hint-btn" data-hint-for="b2q">💡 Hint</button></div>
+            <p class="qprompt">Looking at your line, does it slope upward or downward as you move left to right?</p>
+            <div class="hint-box" id="hint-b2q">As x increases from −2 to 3, does y increase or decrease?</div>
+            <div class="mcq-options">
+              <button class="opt-btn" data-qid="b2q" data-correct="false">Upward</button>
+              <button class="opt-btn" data-qid="b2q" data-correct="true">Downward</button>
+            </div>
+            <div class="feedback" id="fb-b2q"></div>
+            <div class="scaffold-box" id="scaffold-b2q">y goes from 6 down to −4 as x increases — the line falls from left to right. You'll see this again in Section E: it means a negative gradient.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+<!-- SLIDE 9 — (C) FUNCTIONS concept -->
+  <section class="slide dark dense" id="s9">
+    <div class="content-wrap">
+      <div class="eyebrow">Section C — Concept of a Function</div>
+      <h2>One input, exactly one output</h2>
+      <p class="lede">A <strong>function</strong> is a special relationship: every input value maps to <strong>exactly one</strong> output value. If an input could give two different outputs, it's not a function. Tap each example below.</p>
+      <div class="hook-grid stagger">
+        <div class="hook-card" onclick="this.classList.toggle('open')">
+          <span class="hc-icon">🪪</span>
+          <div class="hc-title">Index number → report card</div>
+          <div class="hc-body">Each student's index number belongs to exactly one report card. One input, one output.</div>
+          <div class="hc-tap">tap to check</div>
+          <div class="hc-verdict yes">✓ This is a function</div>
+        </div>
+        <div class="hook-card not-function-card" onclick="this.classList.toggle('open')">
+          <span class="hc-icon">👪</span>
+          <div class="hc-title">Surname → student</div>
+          <div class="hc-body">Many students can share the same surname, so one surname can point to several different students.</div>
+          <div class="hc-tap">tap to check</div>
+          <div class="hc-verdict no">✗ Not a function</div>
+        </div>
+        <div class="hook-card" onclick="this.classList.toggle('open')">
+          <span class="hc-icon">🌡️</span>
+          <div class="hc-title">Exact time → temperature</div>
+          <div class="hc-body">At any single instant, the thermometer reads exactly one value — never two temperatures at once.</div>
+          <div class="hc-tap">tap to check</div>
+          <div class="hc-verdict yes">✓ This is a function</div>
+        </div>
+        <div class="hook-card not-function-card" onclick="this.classList.toggle('open')">
+          <span class="hc-icon">📝</span>
+          <div class="hc-title">Exam score → student</div>
+          <div class="hc-body">Several students could score the same mark, so one score can map to many different students.</div>
+          <div class="hc-tap">tap to check</div>
+          <div class="hc-verdict no">✗ Not a function</div>
+        </div>
+      </div>
+
+      <div class="worked-example-card">
+        <div class="tool-label">✏️ How f(x) works — two examples, same function</div>
+        <div class="flip-card-grid">
+          <div class="flip-card flip-card-worked" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <span class="flip-icon">🔄</span>
+                <p class="flip-question">① f(x) = 2x + 3<br>Find f(4).</p>
+                <span class="flip-tap-hint">tap to reveal</span>
+              </div>
+              <div class="flip-card-back">
+                <div class="flip-worked-steps">f(4) = 2(4) + 3
+f(4) = 8 + 3
+f(4) = 11</div>
+                <span class="flip-tap-hint">tap to hide</span>
+              </div>
+            </div>
+          </div>
+          <div class="flip-card flip-card-worked" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <span class="flip-icon">🔄</span>
+                <p class="flip-question">② f(x) = 2x + 3<br>Find f(−1).</p>
+                <span class="flip-tap-hint">tap to reveal</span>
+              </div>
+              <div class="flip-card-back">
+                <div class="flip-worked-steps">f(−1) = 2(−1) + 3
+f(−1) = −2 + 3
+f(−1) = 1</div>
+                <span class="flip-tap-hint">tap to hide</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="note-callout" style="margin-top:1.1rem;">Notice: x = 4 always gives f(4) = 11 — never anything else. Every time you put in one specific x-value, you get exactly one y-value out. That's what makes it a <strong>function</strong>, and it's true for every linear function.</div>
+      </div>
+
+      <div class="note-callout">Vertical line test: if a vertical line ever crosses a graph more than once, y is not a function of x.</div>
+    </div>
+  </section>
+<!-- SLIDE 10 — (C) practice -->
+  <section class="slide dark dense" id="s10">
+    <div class="content-wrap">
+      <div class="eyebrow">Section C — Practice</div>
+      <h2>Is it a function?</h2>
+      <div class="qgrid">
+
+        <div class="qblock" id="block-qf1" data-group="func">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 9</span><button class="hint-btn" data-hint-for="qf1">💡 Hint</button></div>
+          <p class="qprompt">Each student's index number maps to exactly one report card. Is this a function?</p>
+          <div class="hint-box" id="hint-qf1">Does any index number ever point to two different report cards?</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="qf1" data-correct="true">Yes</button>
+            <button class="opt-btn" data-qid="qf1" data-correct="false">No</button>
+          </div>
+          <div class="feedback" id="fb-qf1"></div>
+          <div class="scaffold-box" id="scaffold-qf1">Each index number belongs to exactly one report card — one input, one output. Yes, it's a function.</div>
+        </div>
+
+        <div class="qblock" id="block-qf2" data-group="func">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 10</span><button class="hint-btn" data-hint-for="qf2">💡 Hint</button></div>
+          <p class="qprompt">A mapping takes each surname to every student who shares that surname. Is this a function (surname → student)?</p>
+          <div class="hint-box" id="hint-qf2">Can two different students share the same surname?</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="qf2" data-correct="false">Yes</button>
+            <button class="opt-btn" data-qid="qf2" data-correct="true">No</button>
+          </div>
+          <div class="feedback" id="fb-qf2"></div>
+          <div class="scaffold-box" id="scaffold-qf2">One surname can map to several different students, so it's not a function.</div>
+        </div>
+
+        <div class="qblock" id="block-qf3" data-group="func">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 11</span><button class="hint-btn" data-hint-for="qf3">💡 Hint</button></div>
+          <p class="qprompt">For a relation to be a function, each input must map to ___.</p>
+          <div class="hint-box" id="hint-qf3">How many outputs is a function allowed to have, for each single input?</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="qf3" data-correct="true">exactly one output</button>
+            <button class="opt-btn" data-qid="qf3" data-correct="false">at least one output</button>
+            <button class="opt-btn" data-qid="qf3" data-correct="false">two outputs</button>
+            <button class="opt-btn" data-qid="qf3" data-correct="false">no outputs</button>
+          </div>
+          <div class="feedback" id="fb-qf3"></div>
+          <div class="scaffold-box" id="scaffold-qf3">The defining rule of a function: exactly one output for every input.</div>
+        </div>
+
+        <div class="qblock" id="block-qf4" data-group="func">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 12</span><button class="hint-btn" data-hint-for="qf4">💡 Hint</button></div>
+          <p class="qprompt">A graph contains the vertical line x = 3. Does this represent y as a function of x?</p>
+          <div class="hint-box" id="hint-qf4">At x = 3, how many different y-values does that line pass through?</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="qf4" data-correct="false">Yes</button>
+            <button class="opt-btn" data-qid="qf4" data-correct="true">No</button>
+          </div>
+          <div class="feedback" id="fb-qf4"></div>
+          <div class="scaffold-box" id="scaffold-qf4">At x = 3, every y-value on that line is included — infinitely many outputs for one input. Not a function.</div>
+        </div>
+
+        <div class="qblock" id="block-qf5" data-group="func">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 13</span><button class="hint-btn" data-hint-for="qf5">💡 Hint</button></div>
+          <p class="qprompt">The rule y = x² + 1 assigns each x exactly one y. Is y a function of x?</p>
+          <div class="hint-box" id="hint-qf5">For any x you pick, how many results does squaring and adding 1 give?</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="qf5" data-correct="true">Yes</button>
+            <button class="opt-btn" data-qid="qf5" data-correct="false">No</button>
+          </div>
+          <div class="feedback" id="fb-qf5"></div>
+          <div class="scaffold-box" id="scaffold-qf5">Squaring a number and adding 1 always gives exactly one result. Yes, it's a function.</div>
+        </div>
+
+        <div class="qblock" id="block-qf6" data-group="func">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 14</span><button class="hint-btn" data-hint-for="qf6">💡 Hint</button></div>
+          <p class="qprompt">If f(x) = 2x + 3, find f(4).</p>
+          <div class="hint-box" id="hint-qf6">What do you get when you substitute x = 4 into f(x) = 2x + 3?</div>
+          <div class="numeric-row">
+            f(4) = <input type="text" inputmode="decimal" id="qf6-ans" placeholder="answer">
+            <button class="check-btn" data-check="numeric" data-qid="qf6" data-ans="11" data-group="func">Check</button>
+          </div>
+          <div class="feedback" id="fb-qf6"></div>
+          <div class="scaffold-box" id="scaffold-qf6">f(4) = 2(4) + 3
+f(4) = 8 + 3
+f(4) = 11</div>
+        </div>
+
+        <div class="qblock" id="block-qf7" data-group="func">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 15</span><button class="hint-btn" data-hint-for="qf7">💡 Hint</button></div>
+          <p class="qprompt">Now compare: is y = 9 a function of x, even though x doesn't appear anywhere in the equation?</p>
+          <div class="hint-box" id="hint-qf7">No matter what x you pick, how many y-values does this equation give?</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="qf7" data-correct="true">Yes</button>
+            <button class="opt-btn" data-qid="qf7" data-correct="false">No</button>
+          </div>
+          <div class="feedback" id="fb-qf7"></div>
+          <div class="scaffold-box" id="scaffold-qf7">Every x-value still gives exactly one y-value — always 9. That's still a function, just a constant one. Compare this to x = 6 (or any vertical line): that's NOT a function, because one single x-value would have to map to every possible y at once.</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+<!-- SLIDE 11 — (D) Equation of a Line: expanded concept -->
+  <section class="slide light dense" id="s11">
+    <div class="content-wrap">
+      <div class="eyebrow">Section D — Linear Functions and Linear Graphs</div>
+      <h2>The Equation of a Line</h2>
+      <p class="lede">Every straight-line graph can be written as an equation. Before we get into it, two quick definitions you'll need:</p>
+
+      <div class="intercept-defs">
+        <div class="intercept-def"><span class="id-term">x-intercept</span> — the x-coordinate of the point where a graph crosses the x-axis.</div>
+        <div class="intercept-def"><span class="id-term">y-intercept</span> — the y-coordinate of the point where a graph crosses the y-axis.</div>
+      </div>
+
+      <p class="lede" style="margin-top:1.2rem;">A linear function's equation always takes the same general form:</p>
+
+      <div class="flip-card flip-card-wide" onclick="this.classList.toggle('flipped')">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+            <span class="flip-icon">🔄</span>
+            <p class="flip-question">What is the general equation of a Straight-Line (Linear) function?</p>
+            <span class="flip-tap-hint">tap to reveal</span>
+          </div>
+          <div class="flip-card-back">
+            <div class="eqn-general-formula" style="color:#fff; margin-bottom:0.7rem;">y = <span style="color:#FFD166;">m</span>x + <span style="color:#FF7AA2;">c</span></div>
+            <div class="eqn-general-rows" style="text-align:left;">
+              <div class="eqn-general-row"><span class="eqn-key" style="color:#FFD166;">m</span> is the <strong>gradient</strong> — how steep the line is, and which direction it slopes.</div>
+              <div class="eqn-general-row"><span class="eqn-key" style="color:#FF7AA2;">c</span> is the <strong>y-intercept</strong> — the point where the line crosses the y-axis, at (0, c).</div>
+            </div>
+            <span class="flip-tap-hint">tap to hide</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card flip-card-wide" onclick="this.classList.toggle('flipped')">
+        <div class="flip-card-inner">
+          <div class="flip-card-front">
+            <span class="flip-icon">🔄</span>
+            <p class="flip-question">What does it mean for a point to "satisfy" an equation?</p>
+            <span class="flip-tap-hint">tap to reveal</span>
+          </div>
+          <div class="flip-card-back">
+            <p style="font-size:0.86rem; line-height:1.6; text-align:left;">When you substitute x = a and y = b into y = mx + c, and <strong>both sides become equal</strong> (LHS = RHS), we say the pair of values <strong>satisfies</strong> the equation.</p>
+            <p style="font-size:0.86rem; line-height:1.6; text-align:left; margin-top:0.6rem;">That means the point (a, b) <strong>lies on the graph</strong> of y = mx + c.</p>
+            <span class="flip-tap-hint">tap to hide</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="worked-example-card">
+        <div class="tool-label">✏️ Worked example — y = 3x − 4</div>
+        <div class="tool-row">
+          <div class="tool-slider-block">
+            <p style="font-size:0.92rem; line-height:1.65;">Comparing y = 3x − 4 to y = mx + c directly:</p>
+            <div class="eqn-general-rows" style="margin-top:0.6rem;">
+              <div class="eqn-general-row"><span class="eqn-key" style="color:var(--coral);">m = 3</span> — the gradient</div>
+              <div class="eqn-general-row"><span class="eqn-key" style="color:var(--mint);">c = −4</span> — the y-intercept</div>
+            </div>
+            <p style="font-size:0.92rem; line-height:1.65; margin-top:0.9rem;">We can check the gradient by picking two points on the line and using rise over run:</p>
+            <div class="gradient-calc-display" style="margin-top:0.6rem;">
+              <span>m =</span>
+              <span class="stacked-frac"><span class="frac-num">6</span><span class="frac-den">2</span></span>
+              <span>= 3 ✓</span>
+            </div>
+            <p style="font-size:0.92rem; line-height:1.65; margin-top:0.9rem;">When you substitute a pair of values x = a and y = b into an equation, and both sides come out equal, we say that pair of values <strong>satisfies the equation</strong>. This tells us the point (a, b) lies exactly on the graph of that equation.</p>
+            <p style="font-size:0.92rem; line-height:1.65; margin-top:0.9rem;">Does the point (1, −1) satisfy y = 3x − 4? Substitute and check both sides:</p>
+            <div class="worked-steps" style="margin-top:0.5rem;">LHS: y = −1
+RHS: 3(1) − 4 = −1
+LHS = RHS ✓ — so (1, −1) lies on the line.</div>
+          </div>
+          <div class="tool-svg-block">
+            <svg viewBox="0 0 350 350" style="max-width:420px;">
+              <g id="d-example-grid"></g>
+              <line x1="160" y1="280" x2="235" y2="55" style="stroke:var(--mint)" stroke-width="2.6"/>
+              <line x1="190" y1="190" x2="220" y2="190" style="stroke:var(--coral)" stroke-dasharray="4,3" stroke-width="1.4"/>
+              <line x1="220" y1="190" x2="220" y2="100" style="stroke:var(--coral)" stroke-dasharray="4,3" stroke-width="1.4"/>
+              <circle cx="190" cy="190" r="4.5" style="fill:var(--gold)"/>
+              <circle cx="220" cy="100" r="4.5" style="fill:var(--gold)"/>
+              <circle cx="175" cy="235" r="5.5" style="fill:var(--coral)"/>
+              <text x="192" y="207" font-size="10" font-family="monospace" fill="currentColor">run = 2</text>
+              <text x="227" y="147" font-size="10" font-family="monospace" fill="currentColor">rise = 6</text>
+              <text x="118" y="252" font-size="10" font-family="monospace" fill="currentColor">y-intercept = −4</text>
+              <text x="195" y="48" font-size="13" font-family="'Space Grotesk', sans-serif" font-weight="700" fill="var(--mint)">y = 3x − 4</text>
+
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="worked-example-card">
+        <div class="tool-label">✏️ Rearranging into y = mx + c form</div>
+        <p style="font-size:0.92rem; line-height:1.65;">Sometimes an equation isn't written in y = mx + c form yet — you'll need to rearrange it first before you can read off m and c.</p>
+        <p style="font-size:0.92rem; line-height:1.65; margin-top:0.8rem;"><strong>Example:</strong> Rearrange 2y = 6x + 8.</p>
+        <div class="worked-steps" style="margin-top:0.5rem;">2y = 6x + 8
+Divide every term by 2:
+y = 3x + 4</div>
+        <p style="font-size:0.92rem; line-height:1.65; margin-top:0.8rem;">Now it's in y = mx + c form, so we can read it straight off: <strong>m = 3</strong>, <strong>c = 4</strong>.</p>
+      </div>
+
+      <div class="note-callout">Next page: use the interactive tool to drag m and c yourself and watch the line move live.</div>
+    </div>
+  </section>
+<!-- SLIDE 12 — (D) Try it — drag m and c -->
+  <section class="slide light dense" id="s12">
+    <div class="content-wrap">
+      <div class="eyebrow">Section D — Try it yourself</div>
+      <h2>Drag m and c and watch the line move</h2>
+      <p class="lede">Use the sliders below to change the gradient and y-intercept. Watch how the line, the equation, and the table of values all update together.</p>
+
+      <div class="tool-card">
+        <div class="tool-label">🎛️ Try it — drag m and c</div>
+        <div class="tool-row">
+          <div class="tool-slider-block">
+            <label>Gradient, m = <span id="lineMLbl">2</span></label>
+            <input type="range" id="lineM" min="-5" max="5" step="0.5" value="2" oninput="updateLineTool()">
+            <label style="margin-top:0.8rem;">y-intercept, c = <span id="lineCLbl">-1</span></label>
+            <input type="range" id="lineC" min="-6" max="6" step="1" value="-1" oninput="updateLineTool()">
+            <div class="tool-output" style="margin-top:1rem;">
+              <div class="line total"><span>Equation</span><span id="lineEqLbl">y = 2x − 1</span></div>
+            </div>
+            <table class="mini-table" style="margin-top:0.8rem;">
+              <tr><th>x</th><td>−2</td><td>0</td><td>2</td></tr>
+              <tr><th>y</th><td id="lineYm2">−5</td><td id="lineY0">−1</td><td id="lineY2">3</td></tr>
+            </table>
+          </div>
+          <div class="tool-svg-block">
+            <svg id="lineSvg" viewBox="0 0 350 350">
+              <defs><clipPath id="lineClip"><rect x="25" y="25" width="300" height="300"/></clipPath></defs>
+              <g id="line-grid"></g><g id="line-dyn"></g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+<!-- SLIDE 13 — (D) practice: evaluate & read equations -->
+  <section class="slide light dense" id="s13">
+    <div class="content-wrap">
+      <div class="eyebrow">Section D — Practice: Linear Equations</div>
+      <h2>Linear equations &amp; tables of values</h2>
+
+      <div class="worked-example-card">
+        <div class="tool-label">✏️ Two directions, one equation: y = 2x + 5</div>
+        <div class="flip-card-grid">
+          <div class="flip-card flip-card-worked" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <span class="flip-icon">🔄</span>
+                <p class="flip-question">① Substitute x, solve for y<br>Find y when x = 3.</p>
+                <span class="flip-tap-hint">tap to reveal</span>
+              </div>
+              <div class="flip-card-back">
+                <div class="flip-worked-steps">y = 2(3) + 5
+y = 6 + 5
+y = 11</div>
+                <span class="flip-tap-hint">tap to hide</span>
+              </div>
+            </div>
+          </div>
+          <div class="flip-card flip-card-worked" onclick="this.classList.toggle('flipped')">
+            <div class="flip-card-inner">
+              <div class="flip-card-front">
+                <span class="flip-icon">🔄</span>
+                <p class="flip-question">② Substitute y, solve for x<br>Find x when y = 11.</p>
+                <span class="flip-tap-hint">tap to reveal</span>
+              </div>
+              <div class="flip-card-back">
+                <div class="flip-worked-steps">11 = 2x + 5
+11 − 5 = 2x
+6 = 2x
+x = 3</div>
+                <span class="flip-tap-hint">tap to hide</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="note-callout" style="margin-top:1.1rem;">Notice: these two examples are opposites of each other. x = 3 gives y = 11 — and y = 11 gives x = 3. Same equation, same line, just working in different directions.</div>
+      </div>
+
+      <div class="qgrid" style="margin-top:1.6rem;">
+
+        <div class="qblock" id="block-ql1" data-group="linear">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 16</span><button class="hint-btn" data-hint-for="ql1">💡 Hint</button></div>
+          <p class="qprompt">For y = 3x − 2, find y when x = 4.</p>
+          <div class="hint-box" id="hint-ql1">What do you get when you substitute x = 4 into y = 3x − 2?</div>
+          <div class="numeric-row">
+            y = <input type="text" inputmode="decimal" id="ql1-ans" placeholder="answer">
+            <button class="check-btn" data-check="numeric" data-qid="ql1" data-ans="10" data-group="linear">Check</button>
+          </div>
+          <div class="feedback" id="fb-ql1"></div>
+          <div class="scaffold-box" id="scaffold-ql1">y = 3(4) − 2
+y = 12 − 2
+y = 10</div>
+        </div>
+
+        <div class="qblock" id="block-ql2" data-group="linear">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 17</span><button class="hint-btn" data-hint-for="ql2">💡 Hint</button></div>
+          <p class="qprompt">For y = −2x + 5, find y when x = −3.</p>
+          <div class="hint-box" id="hint-ql2">There are two negative signs in this substitution — what happens when a negative multiplies a negative?</div>
+          <div class="numeric-row">
+            y = <input type="text" inputmode="decimal" id="ql2-ans" placeholder="answer">
+            <button class="check-btn" data-check="numeric" data-qid="ql2" data-ans="11" data-group="linear">Check</button>
+          </div>
+          <div class="feedback" id="fb-ql2"></div>
+          <div class="scaffold-box" id="scaffold-ql2">y = −2(−3) + 5
+y = 6 + 5
+y = 11</div>
+        </div>
+
+        <div class="qblock" id="block-ql3" data-group="linear">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 18</span><button class="hint-btn" data-hint-for="ql3">💡 Hint</button></div>
+          <p class="qprompt">For y = <span class="stacked-frac"><span class="frac-num">1</span><span class="frac-den">2</span></span>x + 4, find y when x = 6.</p>
+          <div class="hint-box" id="hint-ql3">What is half of 6?</div>
+          <div class="numeric-row">
+            y = <input type="text" inputmode="decimal" id="ql3-ans" placeholder="answer">
+            <button class="check-btn" data-check="numeric" data-qid="ql3" data-ans="7" data-group="linear">Check</button>
+          </div>
+          <div class="feedback" id="fb-ql3"></div>
+          <div class="scaffold-box" id="scaffold-ql3">y = <span class="stacked-frac"><span class="frac-num">1</span><span class="frac-den">2</span></span>(6) + 4
+y = 3 + 4
+y = 7</div>
+        </div>
+
+        <div class="qblock" id="block-ql4" data-group="linear">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 19</span><button class="hint-btn" data-hint-for="ql4">💡 Hint</button></div>
+          <p class="qprompt">The equation y = mx + 5 passes through (0, 5) no matter what m is. What is its y-intercept, c?</p>
+          <div class="hint-box" id="hint-ql4">In y = mx + c, which part of the equation never changes, no matter what x is?</div>
+          <div class="numeric-row">
+            c = <input type="text" inputmode="decimal" id="ql4-ans" placeholder="answer">
+            <button class="check-btn" data-check="numeric" data-qid="ql4" data-ans="5" data-group="linear">Check</button>
+          </div>
+          <div class="feedback" id="fb-ql4"></div>
+          <div class="scaffold-box" id="scaffold-ql4">In y = mx + c, the constant term is c. Here c = 5.</div>
+        </div>
+
+        <div class="qblock" id="block-ql5" data-group="linear">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 20</span><button class="hint-btn" data-hint-for="ql5">💡 Hint</button></div>
+          <p class="qprompt">Which of these is a linear equation in x and y?</p>
+          <div class="hint-box" id="hint-ql5">For an equation to be considered linear, it must fit the general form y = mx + c. Does this equation match that form?</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="ql5" data-correct="false">y = x² + 1</button>
+            <button class="opt-btn" data-qid="ql5" data-correct="true">y = 3x − 7</button>
+            <button class="opt-btn" data-qid="ql5" data-correct="false">y = 1/x</button>
+            <button class="opt-btn" data-qid="ql5" data-correct="false">xy = 6</button>
+          </div>
+          <div class="feedback" id="fb-ql5"></div>
+          <div class="scaffold-box" id="scaffold-ql5">y = 3x − 7 has the form y = mx + c — a straight line. The others involve x², 1/x or xy, so they aren't linear.</div>
+        </div>
+
+        <div class="qblock" id="block-ql6" data-group="linear">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 21</span><button class="hint-btn" data-hint-for="ql6">💡 Hint</button></div>
+          <p class="qprompt">For y = 5x − 3, identify the gradient, m.</p>
+          <div class="hint-box" id="hint-ql6">In y = mx + c, which letter represents the gradient — and what number is in that position here?</div>
+          <div class="numeric-row">
+            m = <input type="text" inputmode="decimal" id="ql6-ans" placeholder="answer">
+            <button class="check-btn" data-check="numeric" data-qid="ql6" data-ans="5" data-group="linear">Check</button>
+          </div>
+          <div class="feedback" id="fb-ql6"></div>
+          <div class="scaffold-box" id="scaffold-ql6">Comparing y = 5x − 3 with y = mx + c:
+m = 5</div>
+        </div>
+
+        <div class="qblock" id="block-ql7" data-group="linear">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 22</span><button class="hint-btn" data-hint-for="ql7">💡 Hint</button></div>
+          <p class="qprompt">Using the same equation, y = 5x − 3, identify the y-intercept, c.</p>
+          <div class="hint-box" id="hint-ql7">In y = mx + c, which letter represents the y-intercept — and what number is in that position here?</div>
+          <div class="numeric-row">
+            c = <input type="text" inputmode="decimal" id="ql7-ans" placeholder="answer">
+            <button class="check-btn" data-check="numeric" data-qid="ql7" data-ans="-3" data-group="linear">Check</button>
+          </div>
+          <div class="feedback" id="fb-ql7"></div>
+          <div class="scaffold-box" id="scaffold-ql7">Comparing y = 5x − 3 with y = mx + c:
+c = −3</div>
+        </div>
+
+        <div class="qblock" id="block-ql8" data-group="linear">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 23</span><button class="hint-btn" data-hint-for="ql8">💡 Hint</button></div>
+          <p class="qprompt">For y = 4x − 3, find x when y = 13.</p>
+          <div class="hint-box" id="hint-ql8">Substitute y = 13 into the equation — what do you get left to solve for x?</div>
+          <div class="numeric-row">
+            x = <input type="text" inputmode="decimal" id="ql8-ans" placeholder="answer">
+            <button class="check-btn" data-check="numeric" data-qid="ql8" data-ans="4" data-group="linear">Check</button>
+          </div>
+          <div class="feedback" id="fb-ql8"></div>
+          <div class="scaffold-box" id="scaffold-ql8">13 = 4x − 3
+13 + 3 = 4x
+16 = 4x
+x = 4</div>
+        </div>
+
+        <div class="qblock" id="block-ql9" data-group="linear">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 24</span><button class="hint-btn" data-hint-for="ql9">💡 Hint</button></div>
+          <p class="qprompt">Rearrange 2y = 6x + 8 into the form y = mx + c. What is the gradient, m?</p>
+          <div class="hint-box" id="hint-ql9">Every term is currently multiplied by 2. What do you need to do to both sides to get y on its own?</div>
+          <div class="numeric-row">
+            m = <input type="text" inputmode="decimal" id="ql9-ans" placeholder="answer">
+            <button class="check-btn" data-check="numeric" data-qid="ql9" data-ans="3" data-group="linear">Check</button>
+          </div>
+          <div class="feedback" id="fb-ql9"></div>
+          <div class="scaffold-box" id="scaffold-ql9">2y = 6x + 8
+Divide every term by 2:
+y = 3x + 4
+m = 3</div>
+        </div>
+
+        <div class="qblock" id="block-ql10" data-group="linear">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 25</span><button class="hint-btn" data-hint-for="ql10">💡 Hint</button></div>
+          <p class="qprompt">Rearrange 4y = 8x − 12 into the form y = mx + c. What is the y-intercept, c?</p>
+          <div class="hint-box" id="hint-ql10">Every term is currently multiplied by 4. What do you need to do to both sides to get y on its own?</div>
+          <div class="numeric-row">
+            c = <input type="text" inputmode="decimal" id="ql10-ans" placeholder="answer">
+            <button class="check-btn" data-check="numeric" data-qid="ql10" data-ans="-3" data-group="linear">Check</button>
+          </div>
+          <div class="feedback" id="fb-ql10"></div>
+          <div class="scaffold-box" id="scaffold-ql10">4y = 8x − 12
+Divide every term by 4:
+y = 2x − 3
+c = −3</div>
+        </div>
+
+        <div class="qblock" id="block-ql11" data-group="linear">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 26</span><button class="hint-btn" data-hint-for="ql11">💡 Hint</button></div>
+          <p class="qprompt">Rearrange 3y − 6x = 12 into the form y = mx + c. What is the gradient, m?</p>
+          <div class="hint-box" id="hint-ql11">First move the −6x to the other side of the equation. Then deal with the 3 in front of y.</div>
+          <div class="numeric-row">
+            m = <input type="text" inputmode="decimal" id="ql11-ans" placeholder="answer">
+            <button class="check-btn" data-check="numeric" data-qid="ql11" data-ans="2" data-group="linear">Check</button>
+          </div>
+          <div class="feedback" id="fb-ql11"></div>
+          <div class="scaffold-box" id="scaffold-ql11">3y − 6x = 12
+3y = 6x + 12
+Divide every term by 3:
+y = 2x + 4
+m = 2</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+<!-- SLIDE 14 — SUMMARY + SCREENSHOT REMINDER -->
+  <section class="slide dark dense" id="s14">
+    <div class="content-wrap">
+      <div class="screenshot-banner">
+        <span class="ss-icon">📸</span>
+        <h3>Take a screenshot of this page now!</h3>
+        <p>This is your record of Part 1 — your score and everything you've learned so far. Your progress is saved on this device, but a screenshot means you'll always have proof of it.</p>
+      </div>
+
+      <div class="eyebrow">Part 1 of 3 complete</div>
+      <div class="score-banner">Your score: <strong id="finalScore">0 / 28</strong></div>
+      <h2 style="margin-top:1.2rem;">Everything you've covered so far</h2>
+
+      <div class="summary-grid stagger">
+        <div class="summary-card">
+          <div class="sc-title">A · The origin, ordered pairs &amp; quadrants</div>
+          <div class="sc-body">
+            <p>The <strong>origin</strong> (0, 0) is where the x-axis and y-axis cross.</p>
+            <p>An <strong>ordered pair</strong> (x, y) gives a point's exact position — x is how far left/right from the origin, y is how far up/down from the origin.</p>
+            <p>The two axes split the plane into <strong>4 quadrants</strong>: I (+,+), II (−,+), III (−,−), IV (+,−).</p>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="sc-title">B · Plotting ordered pairs</div>
+          <div class="sc-body">
+            <p>To plot a point: move to its x-value, then up/down to its y-value.</p>
+            <p>Plot each point in a set, then connect them — if they come from a linear relation, they'll always line up into a perfectly straight line.</p>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="sc-title">C · Functions</div>
+          <div class="sc-body">
+            <p>A <strong>function</strong> means every input maps to exactly one output.</p>
+            <p>For f(x) = 2x + 3, putting in x = 4 always gives f(4) = 11 — never anything else.</p>
+            <p>A vertical line on a graph is NOT a function, since one x-value would give infinitely many y-values.</p>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="sc-title">D · y = mx + c</div>
+          <div class="sc-body">
+            <p>Every linear equation graphs as a straight line.</p>
+            <p><strong>m</strong> is the gradient (steepness/direction), <strong>c</strong> is the y-intercept (where it crosses the y-axis, at (0, c)).</p>
+            <p>You can substitute an x-value to find y, or substitute a y-value to find x — same equation, both directions.</p>
+            <p>If a pair of values makes both sides of the equation equal, they <strong>satisfy the equation</strong> — that point lies on the line.</p>
+            <p>If an equation isn't already in y = mx + c form, rearrange it first before reading off m and c.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-teaser" style="margin-top:1.6rem;">⏭️ Next session (Part 2 of 3): completing a full table of values and drawing the graph, then gradient and real-world applications.</div>
+    </div>
+  </section>
+
+
+</div>
+
+<script>
+  const slideIds = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11','s12','s13','s14'];
+  const darkSlides = new Set(['s1','s3','s5','s6','s9','s10','s14']);
+  const chipGroups = [
+    {group:'cart', label:'A. Coordinates', target:'s5', total:6},
+    {group:'plotb', label:'B. Plot &amp; Draw', target:'s7', total:4},
+    {group:'func', label:'C. Functions', target:'s9', total:7},
+    {group:'linear', label:'D. Linear Eqns', target:'s13', total:11}
+  ];
+  const state = { answered:{}, score:0, groupCount:{} };
+  chipGroups.forEach(g => state.groupCount[g.group] = 0);
+  const totalQuestions = chipGroups.reduce((a,g)=>a+g.total,0);
+
+  // ---------- Progress persistence ----------
+  const STORAGE_KEY = 'linearFunctionsDeck_part1of3_v1';
+  function saveProgress(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        answered: state.answered, score: state.score, groupCount: state.groupCount
+      }));
+    }catch(e){ /* storage unavailable — progress just won't persist */ }
+  }
+  function loadProgress(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    }catch(e){ return null; }
+  }
+  const savedProgress = loadProgress();
+  if(savedProgress){
+    state.answered = savedProgress.answered || {};
+    state.score = savedProgress.score || 0;
+    state.groupCount = Object.assign({}, state.groupCount, savedProgress.groupCount || {});
+  }
+
+  // ---------- Top bar ----------
+  const deck = document.getElementById('deck');
+  const tbChips = document.getElementById('tbChips');
+  chipGroups.forEach(g => {
+    const el = document.createElement('div');
+    el.className = 'progress-item';
+    el.id = 'chip-' + g.group;
+    el.innerHTML = '<span class="dot"></span><span>' + g.label + '</span>';
+    el.onclick = () => document.getElementById(g.target).scrollIntoView({behavior:'smooth'});
+    tbChips.appendChild(el);
+  });
+  document.getElementById('slideTotal').textContent = slideIds.length;
+  document.getElementById('tbScore').textContent = 'Score 0/' + totalQuestions;
+
+  function currentSlideIndex(){
+    let idx = 0, best = Infinity;
+    slideIds.forEach((id,i) => {
+      const r = document.getElementById(id).getBoundingClientRect();
+      const d = Math.abs(r.top);
+      if(d < best){ best = d; idx = i; }
+    });
+    return idx;
+  }
+  function updateTopBarChrome(){
+    const idx = currentSlideIndex();
+    document.getElementById('slideNum').textContent = idx+1;
+    document.getElementById('counterFill').style.width = ((idx+1)/slideIds.length*100) + '%';
+    document.body.classList.toggle('on-dark', darkSlides.has(slideIds[idx]));
+  }
+  deck.addEventListener('scroll', () => window.requestAnimationFrame(updateTopBarChrome));
+  updateTopBarChrome();
+
+  document.getElementById('prevBtn').onclick = () => {
+    const idx = Math.max(0, currentSlideIndex()-1);
+    document.getElementById(slideIds[idx]).scrollIntoView({behavior:'smooth'});
+  };
+  document.getElementById('nextBtn').onclick = () => {
+    const idx = Math.min(slideIds.length-1, currentSlideIndex()+1);
+    document.getElementById(slideIds[idx]).scrollIntoView({behavior:'smooth'});
+  };
+
+  // ---------- hint buttons ----------
+  document.querySelectorAll('.hint-btn').forEach(btn => {
+    btn.onclick = () => {
+      const box = document.getElementById('hint-' + btn.dataset.hintFor);
+      box.classList.toggle('show');
+    };
+  });
+
+  // ---------- score / progress ----------
+  function updateChipAndScore(group){
+    const g = chipGroups.find(x => x.group === group);
+    const chip = document.getElementById('chip-' + group);
+    if(state.groupCount[group] >= g.total){ chip.classList.add('complete'); }
+    document.getElementById('tbScore').textContent = 'Score ' + state.score + '/' + totalQuestions;
+    document.getElementById('finalScore').textContent = state.score + ' / ' + totalQuestions;
+    const finalScoreSummaryEl = document.getElementById('finalScoreSummary');
+    if(finalScoreSummaryEl) finalScoreSummaryEl.textContent = state.score + ' / ' + totalQuestions;
+    const recapEl = document.querySelector('.recap-check[data-recap-group="' + group + '"]');
+    if(recapEl && state.groupCount[group] >= g.total){ recapEl.textContent = '✓'; recapEl.classList.add('done'); }
+  }
+  function markSolved(qid, group){
+    if(state.answered[qid]) return;
+    state.answered[qid] = true;
+    state.score++;
+    state.groupCount[group] = (state.groupCount[group]||0) + 1;
+    const block = document.getElementById('block-' + qid);
+    if(block) block.classList.add('solved');
+    updateChipAndScore(group);
+    saveProgress();
+  }
+
+  // ---------- Shuffle MCQ option order on every load ----------
+  document.querySelectorAll('.mcq-options').forEach(container => {
+    const btns = Array.from(container.children);
+    for(let i = btns.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      container.insertBefore(btns[j], btns[i].nextSibling);
+      [btns[i], btns[j]] = [btns[j], btns[i]];
+    }
+  });
+
+  // ---------- MCQ ----------
+  const mcqAttempts = {};
+  document.querySelectorAll('.opt-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const qid = btn.dataset.qid;
+      const group = document.getElementById('block-' + qid).dataset.group;
+      const options = document.querySelectorAll('.opt-btn[data-qid="'+qid+'"]');
+      const fb = document.getElementById('fb-' + qid);
+      if(btn.dataset.correct === 'true'){
+        options.forEach(o => o.disabled = true);
+        btn.classList.add('correct');
+        fb.textContent = '✓ Correct!';
+        fb.className = 'feedback good';
+        markSolved(qid, group);
+      } else {
+        btn.classList.add('wrong');
+        btn.disabled = true;
+        mcqAttempts[qid] = (mcqAttempts[qid]||0) + 1;
+        fb.textContent = 'Not quite — try another option.';
+        fb.className = 'feedback bad';
+        if(mcqAttempts[qid] >= 2){
+          document.getElementById('hint-' + qid).classList.add('show');
+          const sc = document.getElementById('scaffold-' + qid);
+          if(sc) sc.classList.add('show');
+        }
+      }
+    });
+  });
+
+  // ---------- numeric (handles multi-part qids like b1a, b1b via block-b1) ----------
+  const numAttempts = {};
+  function resolveGroupFor(btn){
+    if(btn.dataset.group) return btn.dataset.group;
+    const baseId = btn.dataset.qid.replace(/[abcd]$/,'');
+    const block = document.getElementById('block-' + baseId);
+    return block ? block.dataset.group : null;
+  }
+  document.querySelectorAll('.check-btn[data-check="numeric"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const qid = btn.dataset.qid;
+      const group = resolveGroupFor(btn);
+      const ans = parseFloat(btn.dataset.ans);
+      const inputEl = document.getElementById(qid + '-ans');
+      const raw = (inputEl.value || '').trim();
+      const baseId = qid.replace(/[abcd]$/,'');
+      const fb = document.getElementById('fb-' + qid) || document.getElementById('fb-' + baseId);
+      if(raw === ''){
+        if(fb){ fb.textContent = '⚠️ Type an answer before checking.'; fb.className = 'feedback bad'; }
+        inputEl.focus();
+        return;
+      }
+      const val = parseFloat(raw.replace(/[^0-9.\-]/g,''));
+      const tol = Math.max(0.02, Math.abs(ans) * 0.01);
+      if(!isNaN(val) && Math.abs(val - ans) <= tol){
+        inputEl.disabled = true;
+        btn.disabled = true;
+        if(fb){ fb.textContent = '✓ Correct!'; fb.className = 'feedback good'; }
+        markSolved(qid, group);
+      } else {
+        numAttempts[qid] = (numAttempts[qid]||0) + 1;
+        if(fb){ fb.textContent = 'Not quite — check your working and try again.'; fb.className = 'feedback bad'; }
+        if(numAttempts[qid] >= 2){
+          const hintBox = document.getElementById('hint-' + qid) || document.getElementById('hint-' + baseId);
+          if(hintBox) hintBox.classList.add('show');
+          const sc = document.getElementById('scaffold-' + qid) || document.getElementById('scaffold-' + baseId);
+          if(sc) sc.classList.add('show');
+        }
+      }
+    });
+  });
+
+  // ============ SVG GRID HELPERS ============
+  // domain -10..10 both axes (big enough for every plotted point in this deck),
+  // viewBox 350x350, center 175, 15px per unit, every integer labelled
+  const GRID_MAX = 10;
+  function toX(x){ return 175 + x*15; }
+  function toY(y){ return 175 - y*15; }
+
+  function buildGridStatic(groupEl){
+    let html = '';
+    for(let i=-GRID_MAX;i<=GRID_MAX;i++){
+      html += `<line x1="${toX(i)}" y1="${toY(-GRID_MAX)}" x2="${toX(i)}" y2="${toY(GRID_MAX)}" stroke="currentColor" stroke-width="1" opacity="0.08"/>`;
+      html += `<line x1="${toX(-GRID_MAX)}" y1="${toY(i)}" x2="${toX(GRID_MAX)}" y2="${toY(i)}" stroke="currentColor" stroke-width="1" opacity="0.08"/>`;
+    }
+    html += `<line x1="${toX(-GRID_MAX)}" y1="${toY(0)}" x2="${toX(GRID_MAX)}" y2="${toY(0)}" stroke="currentColor" stroke-width="1.6" opacity="0.75"/>`;
+    html += `<line x1="${toX(0)}" y1="${toY(-GRID_MAX)}" x2="${toX(0)}" y2="${toY(GRID_MAX)}" stroke="currentColor" stroke-width="1.6" opacity="0.75"/>`;
+    for(let i=-GRID_MAX;i<=GRID_MAX;i++){
+      if(i===0) continue;
+      html += `<text x="${toX(i)}" y="${toY(0)+11}" font-size="6.5" text-anchor="middle" fill="currentColor" opacity="0.55" font-family="monospace">${i}</text>`;
+      html += `<text x="${toX(0)-6}" y="${toY(i)+2.5}" font-size="6.5" text-anchor="end" fill="currentColor" opacity="0.55" font-family="monospace">${i}</text>`;
+    }
+    html += `<text x="${toX(GRID_MAX)+10}" y="${toY(0)+4}" font-size="13" font-style="italic" text-anchor="start" fill="currentColor" opacity="0.85" font-family="'Space Grotesk', sans-serif">x</text>`;
+    html += `<text x="${toX(0)}" y="${toY(GRID_MAX)-8}" font-size="13" font-style="italic" text-anchor="middle" fill="currentColor" opacity="0.85" font-family="'Space Grotesk', sans-serif">y</text>`;
+    groupEl.innerHTML = html;
+  }
+  ['cart-grid','line-grid','grad-grid','example-grid','plot1-grid','plot2-grid','plot3-grid','plot4-grid','plot5-grid','plot6-grid','b1-triangle-grid','d-example-grid'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) buildGridStatic(el);
+  });
+
+  // ---------- Point plotter (Section A) ----------
+  function shadeQuadrants(groupId){
+    const el = document.getElementById(groupId);
+    if(!el) return;
+    // matches the quadrant legend: green / cyan / blue / purple, spread across the spectrum for clear distinction
+    const colorQI = '#34D399';   // green  — Quadrant I  (+,+)
+    const colorQII = '#22D3EE';  // cyan   — Quadrant II (−,+)
+    const colorQIII = '#60A5FA'; // blue   — Quadrant III (−,−)
+    const colorQIV = '#C084FC';  // purple — Quadrant IV (+,−)
+    const op = 0.42;
+    el.innerHTML = `
+      <rect x="${toX(0)}" y="${toY(10)}" width="${toX(10)-toX(0)}" height="${toY(0)-toY(10)}" fill="${colorQI}" opacity="${op}"/>
+      <rect x="${toX(-10)}" y="${toY(10)}" width="${toX(0)-toX(-10)}" height="${toY(0)-toY(10)}" fill="${colorQII}" opacity="${op}"/>
+      <rect x="${toX(-10)}" y="${toY(0)}" width="${toX(0)-toX(-10)}" height="${toY(-10)-toY(0)}" fill="${colorQIII}" opacity="${op}"/>
+      <rect x="${toX(0)}" y="${toY(0)}" width="${toX(10)-toX(0)}" height="${toY(-10)-toY(0)}" fill="${colorQIV}" opacity="${op}"/>
+      <text x="${toX(9)}" y="${toY(9)+8}" text-anchor="end" font-size="12" font-weight="800" font-family="'Space Grotesk', sans-serif" fill="#0F1B2E" opacity="0.5">Quadrant I</text>
+      <text x="${toX(9)}" y="${toY(9)+7}" text-anchor="end" font-size="12" font-weight="800" font-family="'Space Grotesk', sans-serif" fill="#fff">Quadrant I</text>
+      <text x="${toX(-9)}" y="${toY(9)+8}" text-anchor="start" font-size="12" font-weight="800" font-family="'Space Grotesk', sans-serif" fill="#0F1B2E" opacity="0.5">Quadrant II</text>
+      <text x="${toX(-9)}" y="${toY(9)+7}" text-anchor="start" font-size="12" font-weight="800" font-family="'Space Grotesk', sans-serif" fill="#fff">Quadrant II</text>
+      <text x="${toX(-9)}" y="${toY(-9)+9}" text-anchor="start" font-size="12" font-weight="800" font-family="'Space Grotesk', sans-serif" fill="#0F1B2E" opacity="0.5">Quadrant III</text>
+      <text x="${toX(-9)}" y="${toY(-9)+8}" text-anchor="start" font-size="12" font-weight="800" font-family="'Space Grotesk', sans-serif" fill="#fff">Quadrant III</text>
+      <text x="${toX(9)}" y="${toY(-9)+9}" text-anchor="end" font-size="12" font-weight="800" font-family="'Space Grotesk', sans-serif" fill="#0F1B2E" opacity="0.5">Quadrant IV</text>
+      <text x="${toX(9)}" y="${toY(-9)+8}" text-anchor="end" font-size="12" font-weight="800" font-family="'Space Grotesk', sans-serif" fill="#fff">Quadrant IV</text>
+    `;
+  }
+  shadeQuadrants('cart-shade');
+
+  function updateCartTool(){
+    if(!document.getElementById('cartX')) return;
+    const x = parseInt(document.getElementById('cartX').value);
+    const y = parseInt(document.getElementById('cartY').value);
+    document.getElementById('cartXLbl').textContent = x;
+    document.getElementById('cartYLbl').textContent = y;
+    const dyn = document.getElementById('cart-dyn');
+    let quadrant;
+    if(x===0 && y===0) quadrant = 'Origin';
+    else if(x===0) quadrant = 'On the y-axis';
+    else if(y===0) quadrant = 'On the x-axis';
+    else if(x>0 && y>0) quadrant = '1st Quadrant';
+    else if(x<0 && y>0) quadrant = '2nd Quadrant';
+    else if(x<0 && y<0) quadrant = '3rd Quadrant';
+    else quadrant = '4th Quadrant';
+    dyn.innerHTML = `
+      <line x1="${toX(x)}" y1="${toY(0)}" x2="${toX(x)}" y2="${toY(y)}" style="stroke:#fff" stroke-dasharray="3,3" stroke-width="1.4" opacity="0.85"/>
+      <line x1="${toX(0)}" y1="${toY(y)}" x2="${toX(x)}" y2="${toY(y)}" style="stroke:#fff" stroke-dasharray="3,3" stroke-width="1.4" opacity="0.85"/>
+      <circle cx="${toX(x)}" cy="${toY(y)}" r="6.5" style="fill:#FFD166" stroke="#fff" stroke-width="2"/>
+    `;
+    document.getElementById('cartCoordLbl').textContent = `(${x}, ${y})`;
+    document.getElementById('cartQuadLbl').textContent = quadrant;
+  }
+  updateCartTool();
+
+  // ---------- Line grapher (Section D) ----------
+  function fmtC(c){ return c >= 0 ? ' + ' + c : ' − ' + Math.abs(c); }
+  function updateLineTool(){
+    if(!document.getElementById('lineM')) return;
+    const m = parseFloat(document.getElementById('lineM').value);
+    const c = parseFloat(document.getElementById('lineC').value);
+    document.getElementById('lineMLbl').textContent = m;
+    document.getElementById('lineCLbl').textContent = c;
+    const yAt = x => m*x + c;
+    document.getElementById('lineEqLbl').textContent = `y = ${m}x${fmtC(c)}`;
+    const fmt = v => { const r = Math.round(v*100)/100; return Number.isInteger(r) ? r : r.toFixed(2).replace(/0$/,''); };
+    document.getElementById('lineYm2').textContent = fmt(yAt(-2));
+    document.getElementById('lineY0').textContent = fmt(yAt(0));
+    document.getElementById('lineY2').textContent = fmt(yAt(2));
+    const dyn = document.getElementById('line-dyn');
+    const y1 = yAt(-6), y2 = yAt(6);
+    dyn.innerHTML = `
+      <line x1="${toX(-6)}" y1="${toY(y1)}" x2="${toX(6)}" y2="${toY(y2)}" style="stroke:var(--mint)" stroke-width="2.4" clip-path="url(#lineClip)"/>
+      <circle cx="${toX(-2)}" cy="${toY(yAt(-2))}" r="4" style="fill:var(--gold)" clip-path="url(#lineClip)"/>
+      <circle cx="${toX(0)}" cy="${toY(yAt(0))}" r="4" style="fill:var(--gold)" clip-path="url(#lineClip)"/>
+      <circle cx="${toX(2)}" cy="${toY(yAt(2))}" r="4" style="fill:var(--gold)" clip-path="url(#lineClip)"/>
+    `;
+  }
+  updateLineTool();
+
+  // ---------- Gradient explorer (Section E) ----------
+  function updateGradTool(){
+    if(!document.getElementById('gx1')) return;
+    const x1 = parseInt(document.getElementById('gx1').value);
+    const y1 = parseInt(document.getElementById('gy1').value);
+    const x2 = parseInt(document.getElementById('gx2').value);
+    const y2 = parseInt(document.getElementById('gy2').value);
+    document.getElementById('gx1Lbl').textContent = x1;
+    document.getElementById('gy1Lbl').textContent = y1;
+    document.getElementById('gx2Lbl').textContent = x2;
+    document.getElementById('gy2Lbl').textContent = y2;
+    const rise = y2 - y1;
+    const run = x2 - x1;
+    document.getElementById('gOutRise').textContent = rise;
+    document.getElementById('gOutRun').textContent = run;
+    document.getElementById('gOutGrad').textContent = run === 0 ? 'undefined' : (Math.round((rise/run)*100)/100);
+    document.getElementById('gOutRiseFrac').textContent = rise;
+    document.getElementById('gOutRunFrac').textContent = run === 0 ? '0' : run;
+    const dyn = document.getElementById('grad-dyn');
+    dyn.innerHTML = `
+      <line x1="${toX(x1)}" y1="${toY(y1)}" x2="${toX(x2)}" y2="${toY(y1)}" style="stroke:var(--gold)" stroke-dasharray="3,3" stroke-width="1.2"/>
+      <line x1="${toX(x2)}" y1="${toY(y1)}" x2="${toX(x2)}" y2="${toY(y2)}" style="stroke:var(--gold)" stroke-dasharray="3,3" stroke-width="1.2"/>
+      <line x1="${toX(x1)}" y1="${toY(y1)}" x2="${toX(x2)}" y2="${toY(y2)}" style="stroke:var(--mint)" stroke-width="2.4"/>
+      <circle cx="${toX(x1)}" cy="${toY(y1)}" r="5" style="fill:var(--coral)"/>
+      <circle cx="${toX(x2)}" cy="${toY(y2)}" r="5" style="fill:var(--coral)"/>
+      <text x="${toX(x1)-8}" y="${toY(y1)-8}" font-size="10" font-family="monospace" fill="currentColor">A</text>
+      <text x="${toX(x2)+6}" y="${toY(y2)-8}" font-size="10" font-family="monospace" fill="currentColor">B</text>
+    `;
+  }
+  updateGradTool();
+
+  // ---------- Small auto-fit "line through two points" diagrams for practice questions ----------
+  function renderTwoPointDiagram(svgId, p1, p2){
+    const svg = document.getElementById(svgId);
+    if(!svg) return;
+    const W = 300, H = 220, pad = 34;
+    let minX = Math.min(p1[0], p2[0], 0) - 1;
+    let maxX = Math.max(p1[0], p2[0], 0) + 1;
+    let minY = Math.min(p1[1], p2[1], 0) - 1;
+    let maxY = Math.max(p1[1], p2[1], 0) + 1;
+    const scaleX = (W - 2*pad) / (maxX - minX);
+    const scaleY = (H - 2*pad) / (maxY - minY);
+    const px = x => pad + (x - minX) * scaleX;
+    const py = y => H - pad - (y - minY) * scaleY;
+    const x1 = px(p1[0]), y1 = py(p1[1]), x2 = px(p2[0]), y2 = py(p2[1]);
+    let html = '';
+    html += `<line x1="${pad}" y1="${py(0)}" x2="${W-pad}" y2="${py(0)}" stroke="currentColor" stroke-width="1.4" opacity="0.5"/>`;
+    html += `<line x1="${px(0)}" y1="${pad}" x2="${px(0)}" y2="${H-pad}" stroke="currentColor" stroke-width="1.4" opacity="0.5"/>`;
+    html += `<text x="${W-pad+8}" y="${py(0)+4}" font-size="12" font-style="italic" fill="currentColor" opacity="0.8" font-family="'Space Grotesk', sans-serif">x</text>`;
+    html += `<text x="${px(0)}" y="${pad-8}" font-size="12" font-style="italic" text-anchor="middle" fill="currentColor" opacity="0.8" font-family="'Space Grotesk', sans-serif">y</text>`;
+    // rise/run brackets
+    html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y1}" stroke="var(--coral)" stroke-dasharray="4,3" stroke-width="1.3"/>`;
+    html += `<line x1="${x2}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--coral)" stroke-dasharray="4,3" stroke-width="1.3"/>`;
+    // the line itself, extended slightly beyond both points
+    const dx = x2 - x1, dy = y2 - y1;
+    const ext = 0.18;
+    html += `<line x1="${x1 - dx*ext}" y1="${y1 - dy*ext}" x2="${x2 + dx*ext}" y2="${y2 + dy*ext}" stroke="var(--mint)" stroke-width="2.4"/>`;
+    // points
+    html += `<circle cx="${x1}" cy="${y1}" r="5" style="fill:var(--gold)"/>`;
+    html += `<circle cx="${x2}" cy="${y2}" r="5" style="fill:var(--gold)"/>`;
+    const label1Above = y1 < y2;
+    html += `<text x="${x1+8}" y="${label1Above ? y1-8 : y1+16}" font-size="11" font-family="monospace" fill="currentColor">(${p1[0]}, ${p1[1]})</text>`;
+    html += `<text x="${x2+8}" y="${label1Above ? y2+16 : y2-8}" font-size="11" font-family="monospace" fill="currentColor">(${p2[0]}, ${p2[1]})</text>`;
+    svg.innerHTML = html;
+  }
+  renderTwoPointDiagram('qg1-diagram', [1,2], [4,11]);
+  renderTwoPointDiagram('qg2-diagram', [-2,5], [3,-5]);
+  renderTwoPointDiagram('qg3-diagram', [0,4], [6,4]);
+  renderTwoPointDiagram('b2-diagram', [2,5], [6,17]);
+
+  // ============ CLICK-TO-PLOT ACTIVITIES (Section B + Section D table) ============
+  function svgCoordFromEvent(evt, svgEl){
+    const rect = svgEl.getBoundingClientRect();
+    const scaleX = 350/rect.width, scaleY = 350/rect.height;
+    const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+    const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+    const px = (clientX - rect.left) * scaleX;
+    const py = (clientY - rect.top) * scaleY;
+    return {px, py}; // raw svg-space pixel position — matched against targets by distance, not rounded
+  }
+  const PLOT_TAP_TOLERANCE = 9; // svg units — under half the 15-unit grid spacing, so adjacent points never clash
+
+  function setupPlotActivity(opts){
+    // opts: {svgId, dynId, progressId, targets: [[x,y],...], group, qidPrefix, lineColor}
+    const svg = document.getElementById(opts.svgId);
+    if(!svg) return; // this activity's slide isn't part of this session
+    const dyn = document.getElementById(opts.dynId);
+    const progressEl = document.getElementById(opts.progressId);
+    const done = new Set();
+    const targetKeys = opts.targets.map(t => t[0]+','+t[1]);
+    let completed = false;
+
+    // restore from saved progress, if this activity was already finished
+    if(opts.qidPrefix && state.answered[opts.qidPrefix]){
+      completed = true;
+      targetKeys.forEach(k => done.add(k));
+    }
+
+    function render(){
+      let html = '';
+      done.forEach(key => {
+        const [px,py] = key.split(',').map(Number);
+        html += `<circle cx="${toX(px)}" cy="${toY(py)}" r="5.5" style="fill:var(--mint)"/>`;
+      });
+      if(completed){
+        const pts = opts.targets.slice().sort((a,b)=>a[0]-b[0]);
+        const path = pts.map(p => toX(p[0])+','+toY(p[1])).join(' ');
+        html = `<polyline points="${path}" fill="none" style="stroke:${opts.lineColor||'var(--mint)'}" stroke-width="2.4"/>` + html;
+      }
+      dyn.innerHTML = html;
+      if(progressEl){
+        if(completed){
+          progressEl.textContent = opts.completeMsg || (opts.targets.length + ' / ' + opts.targets.length + ' points plotted — connected!');
+          progressEl.classList.add('done');
+        } else {
+          progressEl.textContent = (opts.progressPrefix||'') + done.size + ' / ' + opts.targets.length + ' points plotted';
+        }
+      }
+    }
+
+    svg.addEventListener('click', (evt) => {
+      if(completed) return;
+      const {px, py} = svgCoordFromEvent(evt, svg);
+      // find the nearest not-yet-plotted target, matched by on-screen distance rather than exact rounding
+      let bestKey = null, bestDist = Infinity;
+      opts.targets.forEach(t => {
+        const key = t[0] + ',' + t[1];
+        if(done.has(key)) return;
+        const d = Math.hypot(px - toX(t[0]), py - toY(t[1]));
+        if(d < bestDist){ bestDist = d; bestKey = key; }
+      });
+      if(bestKey !== null && bestDist <= PLOT_TAP_TOLERANCE){
+        done.add(bestKey);
+        if(done.size === opts.targets.length){
+          completed = true;
+          if(opts.qidPrefix) markSolved(opts.qidPrefix, opts.group);
+          if(opts.onComplete) opts.onComplete();
+        }
+        render();
+      } else {
+        // brief wrong-click flash, shown exactly where they tapped
+        const flash = document.createElementNS('http://www.w3.org/2000/svg','text');
+        flash.setAttribute('x', px); flash.setAttribute('y', py);
+        flash.setAttribute('font-size','16'); flash.setAttribute('text-anchor','middle');
+        flash.setAttribute('fill','var(--coral)'); flash.textContent = '✕';
+        dyn.appendChild(flash);
+        setTimeout(() => { if(flash.parentNode) flash.parentNode.removeChild(flash); }, 600);
+      }
+    });
+
+    render();
+  }
+
+  setupPlotActivity({
+    svgId:'plotSvg1', dynId:'plot1-dyn', progressId:'plot1-progress',
+    targets:[[-4,-5],[-1,1],[2,7]], group:'plotb', qidPrefix:'plot1'
+  });
+  setupPlotActivity({
+    svgId:'plotSvg2', dynId:'plot2-dyn', progressId:'plot2-progress',
+    targets:[[-2,6],[0,2],[3,-4]], group:'plotb', qidPrefix:'plot2', lineColor:'var(--coral)'
+  });
+
+  // ---------- Section D: fill table + plot (3 exercises) ----------
+  const tableFillExercises = {
+    ex1: { ids:['tf1','tf2','tf3','tf4'], answers:[-9,-5,-1,3], hintId:'tf' },
+    ex2: { ids:['tg1','tg2','tg3'], answers:[6,4,1], hintId:'tg' },
+    ex3: { ids:['th1','th2','th3'], answers:[-7,-1,5], hintId:'th' },
+    ex4: { ids:['ti1','ti2','ti3','ti4','ti5'], answers:[7,5,3,1,-1], hintId:'ti' }
+  };
+  const tableFillAttempts = {};
+  function checkTableFill(exKey){
+    const ex = tableFillExercises[exKey];
+    let allCorrect = true;
+    ex.ids.forEach((id, i) => {
+      const input = document.getElementById(id+'-ans');
+      const val = parseFloat((input.value||'').replace(/[^0-9.\-]/g,''));
+      const correct = Math.abs(val - ex.answers[i]) <= 0.02;
+      input.classList.remove('cell-correct','cell-wrong');
+      if(!isNaN(val) && correct){
+        input.classList.add('cell-correct');
+        input.disabled = true;
+        markSolved(id, 'tablefill');
+      } else {
+        input.classList.add('cell-wrong');
+        allCorrect = false;
+      }
+    });
+    const fb = document.getElementById('fb-tablefill-' + exKey);
+    if(allCorrect){
+      fb.textContent = '✓ Table complete! Now plot these points on the grid.';
+      fb.className = 'feedback good';
+      return;
+    }
+    tableFillAttempts[exKey] = (tableFillAttempts[exKey] || 0) + 1;
+    document.getElementById('hint-' + ex.hintId).classList.add('show');
+    if(tableFillAttempts[exKey] >= 3){
+      fb.textContent = 'Here\'s one worked through for you below — use the same method for the rest.';
+      fb.className = 'feedback bad';
+      document.getElementById('scaffold-tablefill-' + exKey).classList.add('show');
+    } else {
+      fb.textContent = 'Not quite yet — check the hint and try again (' + (3 - tableFillAttempts[exKey]) + ' more ' + (3 - tableFillAttempts[exKey] === 1 ? 'try' : 'tries') + ' before a worked example appears).';
+      fb.className = 'feedback bad';
+    }
+  }
+  function checkGradIntercept(){
+    const mInput = document.getElementById('tigm-ans');
+    const cInput = document.getElementById('tigc-ans');
+    const mVal = parseFloat((mInput.value||'').replace(/[^0-9.\-]/g,''));
+    const cVal = parseFloat((cInput.value||'').replace(/[^0-9.\-]/g,''));
+    const mOk = !isNaN(mVal) && Math.abs(mVal - (-2)) <= 0.02;
+    const cOk = !isNaN(cVal) && Math.abs(cVal - 3) <= 0.02;
+    mInput.classList.toggle('cell-correct', mOk); mInput.classList.toggle('cell-wrong', !mOk);
+    cInput.classList.toggle('cell-correct', cOk); cInput.classList.toggle('cell-wrong', !cOk);
+    if(mOk){ mInput.disabled = true; markSolved('tigm', 'tablefill'); }
+    if(cOk){ cInput.disabled = true; markSolved('tigc', 'tablefill'); }
+    const fb = document.getElementById('fb-gradintercept-ex4');
+    if(mOk && cOk){
+      fb.textContent = '✓ Correct! m = −2, c = 3.';
+      fb.className = 'feedback good';
+    } else {
+      fb.textContent = 'Not quite — check against y = mx + c.';
+      fb.className = 'feedback bad';
+      document.getElementById('scaffold-gradintercept-ex4').classList.add('show');
+    }
+  }
+  // plotting works independently of table-check state, using the same correct target points
+  setupPlotActivity({
+    svgId:'plotSvg3', dynId:'plot3-dyn', progressId:'plot3-progress',
+    targets:[[-3,-9],[-1,-5],[1,-1],[3,3]], group:'tablefill', qidPrefix:'plot3',
+    progressPrefix:'Click the grid to plot each point: '
+  });
+  setupPlotActivity({
+    svgId:'plotSvg4', dynId:'plot4-dyn', progressId:'plot4-progress',
+    targets:[[-2,6],[0,4],[3,1]], group:'tablefill', qidPrefix:'plot4',
+    progressPrefix:'Click the grid to plot each point: '
+  });
+  setupPlotActivity({
+    svgId:'plotSvg5', dynId:'plot5-dyn', progressId:'plot5-progress',
+    targets:[[-2,-7],[0,-1],[2,5]], group:'tablefill', qidPrefix:'plot5',
+    progressPrefix:'Click the grid to plot each point: '
+  });
+  setupPlotActivity({
+    svgId:'plotSvg6', dynId:'plot6-dyn', progressId:'plot6-progress',
+    targets:[[-2,7],[-1,5],[0,3],[1,1],[2,-1]], group:'tablefill', qidPrefix:'plot6',
+    progressPrefix:'Click the grid to plot each point: '
+  });
+
+  // ---------- Restore previously-answered questions on load ----------
+  function restoreUI(){
+    // MCQ
+    document.querySelectorAll('.mcq-options').forEach(container => {
+      const first = container.querySelector('.opt-btn');
+      const qid = first ? first.dataset.qid : null;
+      if(qid && state.answered[qid]){
+        const btns = container.querySelectorAll('.opt-btn');
+        btns.forEach(b => { b.disabled = true; if(b.dataset.correct === 'true') b.classList.add('correct'); });
+        const block = document.getElementById('block-' + qid);
+        if(block) block.classList.add('solved');
+        const fb = document.getElementById('fb-' + qid);
+        if(fb){ fb.textContent = '✓ Correct!'; fb.className = 'feedback good'; }
+      }
+    });
+    // numeric check-btn based (handles multi-part ids too)
+    document.querySelectorAll('.check-btn[data-check="numeric"]').forEach(btn => {
+      const qid = btn.dataset.qid;
+      if(state.answered[qid]){
+        const input = document.getElementById(qid + '-ans');
+        if(input){ input.value = btn.dataset.ans; input.disabled = true; }
+        btn.disabled = true;
+        const baseId = qid.replace(/[abcd]$/,'');
+        const fb = document.getElementById('fb-' + qid) || document.getElementById('fb-' + baseId);
+        if(fb){ fb.textContent = '✓ Correct!'; fb.className = 'feedback good'; }
+        const block = document.getElementById('block-' + baseId);
+        if(block) block.classList.add('solved');
+      }
+    });
+    // table-fill cells
+    Object.keys(tableFillExercises).forEach(exKey => {
+      const ex = tableFillExercises[exKey];
+      let allDone = true;
+      ex.ids.forEach((id,i) => {
+        if(state.answered[id]){
+          const input = document.getElementById(id+'-ans');
+          if(input){ input.value = ex.answers[i]; input.disabled = true; input.classList.add('cell-correct'); }
+        } else { allDone = false; }
+      });
+      if(allDone){
+        const fb = document.getElementById('fb-tablefill-' + exKey);
+        if(fb){ fb.textContent = '✓ Table complete! Now plot these points on the grid.'; fb.className = 'feedback good'; }
+      }
+    });
+    // gradient/y-intercept mini-check (Exercise 4)
+    if(state.answered['tigm']){
+      const el = document.getElementById('tigm-ans');
+      if(el){ el.value = -2; el.disabled = true; el.classList.add('cell-correct'); }
+    }
+    if(state.answered['tigc']){
+      const el = document.getElementById('tigc-ans');
+      if(el){ el.value = 3; el.disabled = true; el.classList.add('cell-correct'); }
+    }
+    if(state.answered['tigm'] && state.answered['tigc']){
+      const fb = document.getElementById('fb-gradintercept-ex4');
+      if(fb){ fb.textContent = '✓ Correct! m = −2, c = 3.'; fb.className = 'feedback good'; }
+    }
+    // refresh chips + score displays
+    chipGroups.forEach(g => {
+      const chip = document.getElementById('chip-' + g.group);
+      if(state.groupCount[g.group] >= g.total && chip) chip.classList.add('complete');
+      const recapEl = document.querySelector('.recap-check[data-recap-group="' + g.group + '"]');
+      if(recapEl && state.groupCount[g.group] >= g.total){ recapEl.textContent = '✓'; recapEl.classList.add('done'); }
+    });
+    document.getElementById('tbScore').textContent = 'Score ' + state.score + '/' + totalQuestions;
+    document.getElementById('finalScore').textContent = state.score + ' / ' + totalQuestions;
+    const finalScoreSummaryEl2 = document.getElementById('finalScoreSummary');
+    if(finalScoreSummaryEl2) finalScoreSummaryEl2.textContent = state.score + ' / ' + totalQuestions;
+  }
+  restoreUI();
+
+  // ---------- Reset progress ----------
+  function resetProgress(){
+    try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+    location.reload();
+  }
+  const resetBtn = document.getElementById('resetProgressBtn');
+  if(resetBtn) resetBtn.addEventListener('click', () => {
+    if(confirm('Reset all progress on this workbook? This can\'t be undone.')) resetProgress();
+  });
+
+  // ---------- Laser pointer ----------
+  (function(){
+    let active = false;
+    const dot = document.getElementById('laserDot');
+    const toggle = document.getElementById('laserToggle');
+    toggle.addEventListener('click', () => {
+      active = !active;
+      toggle.classList.toggle('active', active);
+      dot.style.display = active ? 'block' : 'none';
+    });
+    function moveDot(x, y){ dot.style.left = x + 'px'; dot.style.top = y + 'px'; }
+    document.addEventListener('mousemove', e => { if(active) moveDot(e.clientX, e.clientY); });
+    document.addEventListener('touchmove', e => {
+      if(active && e.touches[0]){
+        e.preventDefault(); // stop the page itself from scrolling while the laser is on
+        moveDot(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, {passive:false});
+  })();
+
+  // ---------- Math symbol toolbar ----------
+  (function(){
+    const symbols = ['−','+','×','÷','=','(',')','²','³','√','π','/','°','≤','≥','≠','∞','Σ','∆','θ'];
+    const bar = document.getElementById('mathToolbar');
+    symbols.forEach(sym => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = sym;
+      btn.addEventListener('click', () => insertSymbol(sym));
+      bar.appendChild(btn);
+    });
+    let lastFocusedInput = null;
+    document.addEventListener('focusin', e => {
+      if(e.target.tagName === 'INPUT' && e.target.type === 'text') lastFocusedInput = e.target;
+    });
+    function insertSymbol(sym){
+      if(!lastFocusedInput || lastFocusedInput.disabled) return;
+      const el = lastFocusedInput;
+      const start = el.selectionStart != null ? el.selectionStart : el.value.length;
+      const end = el.selectionEnd != null ? el.selectionEnd : el.value.length;
+      el.value = el.value.slice(0, start) + sym + el.value.slice(end);
+      const pos = start + sym.length;
+      el.focus();
+      el.setSelectionRange(pos, pos);
+    }
+  })();
+</script>
+</body>
+</html>
