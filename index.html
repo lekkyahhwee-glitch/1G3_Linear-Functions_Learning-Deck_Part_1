@@ -319,6 +319,8 @@
   .qblock.solved{ border-color:var(--mint); }
   .qhead{ display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; }
   .qtag{ font-family:var(--font-mono); font-size:0.74rem; opacity:0.7; display:flex; align-items:center; gap:0.4rem; }
+  .think-badge{ font-family:var(--font-mono); font-size:0.7rem; font-weight:700; color:var(--violet); background:rgba(13,148,136,0.12);
+    border:1px solid rgba(13,148,136,0.35); border-radius:12px; padding:0.15rem 0.55rem; }
   .solved-icon{ display:none; color:var(--mint); font-weight:700; }
   .qblock.solved .solved-icon{ display:inline; }
   .hint-btn{
@@ -445,7 +447,7 @@
   <button class="tb-nav-btn" id="prevBtn" aria-label="previous">←</button>
   <div class="tb-counter"><span id="slideNum">1</span>/<span id="slideTotal">14</span><span class="track"><span class="fill" id="counterFill"></span></span></div>
   <div class="tb-chips" id="tbChips"></div>
-  <div class="tb-score" id="tbScore">Score 0/28</div>
+  <div class="tb-score" id="tbScore">Score 0/32</div>
   <button class="tb-nav-btn" id="resetProgressBtn" aria-label="reset progress" title="Reset progress">⟲</button>
   <button class="tb-nav-btn" id="nextBtn" aria-label="next">→</button>
 </div>
@@ -742,6 +744,20 @@ Coordinates: (4, −3)</div>
           <div class="scaffold-box" id="scaffold-qc6">Every point on the x-axis has moved 0 units up or down, so y = 0. E.g. (5, 0), (−2, 0).</div>
         </div>
 
+        <div class="qblock" id="block-qc7" data-group="cart">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 7</span><span class="think-badge">💭 Think</span><button class="hint-btn" data-hint-for="qc7">💡 Hint</button></div>
+          <p class="qprompt">If a point has x = 0, what does that tell you about where it sits — and why?</p>
+          <div class="hint-box" id="hint-qc7">If x tells you how far left/right you've moved from the origin, what does x = 0 mean about that movement?</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="qc7" data-correct="true">It sits exactly on the y-axis</button>
+            <button class="opt-btn" data-qid="qc7" data-correct="false">It sits exactly on the x-axis</button>
+            <button class="opt-btn" data-qid="qc7" data-correct="false">It's always at the origin</button>
+            <button class="opt-btn" data-qid="qc7" data-correct="false">It could be anywhere on the graph</button>
+          </div>
+          <div class="feedback" id="fb-qc7"></div>
+          <div class="scaffold-box" id="scaffold-qc7">x = 0 means zero movement left or right from the origin — so the point must sit directly on the vertical axis, the y-axis.</div>
+        </div>
+
       </div>
     </div>
   </section>
@@ -791,7 +807,7 @@ Coordinates: (4, −3)</div>
         </div>
         <div class="plot-followup qgrid">
           <div class="qblock" id="block-b1q" data-group="plotb">
-            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 7</span><button class="hint-btn" data-hint-for="b1q">💡 Hint</button></div>
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 8</span><button class="hint-btn" data-hint-for="b1q">💡 Hint</button></div>
             <p class="qprompt">Once connected, what shape do these three points form?</p>
             <div class="hint-box" id="hint-b1q">If every point comes from the same linear equation, what shape would you expect when you join them up?</div>
             <div class="mcq-options">
@@ -817,7 +833,7 @@ Coordinates: (4, −3)</div>
         </div>
         <div class="plot-followup qgrid">
           <div class="qblock" id="block-b2q" data-group="plotb">
-            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 8</span><button class="hint-btn" data-hint-for="b2q">💡 Hint</button></div>
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 9</span><button class="hint-btn" data-hint-for="b2q">💡 Hint</button></div>
             <p class="qprompt">Looking at your line, does it slope upward or downward as you move left to right?</p>
             <div class="hint-box" id="hint-b2q">As x increases from −2 to 3, does y increase or decrease?</div>
             <div class="mcq-options">
@@ -826,6 +842,20 @@ Coordinates: (4, −3)</div>
             </div>
             <div class="feedback" id="fb-b2q"></div>
             <div class="scaffold-box" id="scaffold-b2q">y goes from 6 down to −4 as x increases — the line falls from left to right. You'll see this again in Section E: it means a negative gradient.</div>
+          </div>
+
+          <div class="qblock" id="block-b3q" data-group="plotb">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 10</span><span class="think-badge">💭 Think</span><button class="hint-btn" data-hint-for="b3q">💡 Hint</button></div>
+            <p class="qprompt">If you accidentally plotted one point in the wrong quadrant, what would happen when you tried to draw the straight line through all your points?</p>
+            <div class="hint-box" id="hint-b3q">If every other point comes from the same equation and lines up perfectly, what happens when one point doesn't belong there?</div>
+            <div class="mcq-options">
+              <button class="opt-btn" data-qid="b3q" data-correct="true">That point wouldn't line up with the others</button>
+              <button class="opt-btn" data-qid="b3q" data-correct="false">The line would still be perfectly straight</button>
+              <button class="opt-btn" data-qid="b3q" data-correct="false">It wouldn't matter as long as you connect the points in order</button>
+              <button class="opt-btn" data-qid="b3q" data-correct="false">The graph would automatically fix itself</button>
+            </div>
+            <div class="feedback" id="fb-b3q"></div>
+            <div class="scaffold-box" id="scaffold-b3q">A point plotted in the wrong quadrant almost certainly doesn't satisfy the equation — so it won't sit on the same line as the rest. You'd see a visible kink or an outlier point, which is actually a useful way to catch plotting mistakes.</div>
           </div>
         </div>
       </div>
@@ -917,7 +947,7 @@ f(−1) = 1</div>
       <div class="qgrid">
 
         <div class="qblock" id="block-qf1" data-group="func">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 9</span><button class="hint-btn" data-hint-for="qf1">💡 Hint</button></div>
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 11</span><button class="hint-btn" data-hint-for="qf1">💡 Hint</button></div>
           <p class="qprompt">Each student's index number maps to exactly one report card. Is this a function?</p>
           <div class="hint-box" id="hint-qf1">Does any index number ever point to two different report cards?</div>
           <div class="mcq-options">
@@ -929,7 +959,7 @@ f(−1) = 1</div>
         </div>
 
         <div class="qblock" id="block-qf2" data-group="func">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 10</span><button class="hint-btn" data-hint-for="qf2">💡 Hint</button></div>
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 12</span><button class="hint-btn" data-hint-for="qf2">💡 Hint</button></div>
           <p class="qprompt">A mapping takes each surname to every student who shares that surname. Is this a function (surname → student)?</p>
           <div class="hint-box" id="hint-qf2">Can two different students share the same surname?</div>
           <div class="mcq-options">
@@ -941,7 +971,7 @@ f(−1) = 1</div>
         </div>
 
         <div class="qblock" id="block-qf3" data-group="func">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 11</span><button class="hint-btn" data-hint-for="qf3">💡 Hint</button></div>
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 13</span><button class="hint-btn" data-hint-for="qf3">💡 Hint</button></div>
           <p class="qprompt">For a relation to be a function, each input must map to ___.</p>
           <div class="hint-box" id="hint-qf3">How many outputs is a function allowed to have, for each single input?</div>
           <div class="mcq-options">
@@ -955,7 +985,7 @@ f(−1) = 1</div>
         </div>
 
         <div class="qblock" id="block-qf4" data-group="func">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 12</span><button class="hint-btn" data-hint-for="qf4">💡 Hint</button></div>
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 14</span><button class="hint-btn" data-hint-for="qf4">💡 Hint</button></div>
           <p class="qprompt">A graph contains the vertical line x = 3. Does this represent y as a function of x?</p>
           <div class="hint-box" id="hint-qf4">At x = 3, how many different y-values does that line pass through?</div>
           <div class="mcq-options">
@@ -967,7 +997,7 @@ f(−1) = 1</div>
         </div>
 
         <div class="qblock" id="block-qf5" data-group="func">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 13</span><button class="hint-btn" data-hint-for="qf5">💡 Hint</button></div>
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 15</span><button class="hint-btn" data-hint-for="qf5">💡 Hint</button></div>
           <p class="qprompt">The rule y = x² + 1 assigns each x exactly one y. Is y a function of x?</p>
           <div class="hint-box" id="hint-qf5">For any x you pick, how many results does squaring and adding 1 give?</div>
           <div class="mcq-options">
@@ -979,7 +1009,7 @@ f(−1) = 1</div>
         </div>
 
         <div class="qblock" id="block-qf6" data-group="func">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 14</span><button class="hint-btn" data-hint-for="qf6">💡 Hint</button></div>
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 16</span><button class="hint-btn" data-hint-for="qf6">💡 Hint</button></div>
           <p class="qprompt">If f(x) = 2x + 3, find f(4).</p>
           <div class="hint-box" id="hint-qf6">What do you get when you substitute x = 4 into f(x) = 2x + 3?</div>
           <div class="numeric-row">
@@ -993,7 +1023,7 @@ f(4) = 11</div>
         </div>
 
         <div class="qblock" id="block-qf7" data-group="func">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 15</span><button class="hint-btn" data-hint-for="qf7">💡 Hint</button></div>
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 17</span><button class="hint-btn" data-hint-for="qf7">💡 Hint</button></div>
           <p class="qprompt">Now compare: is y = 9 a function of x, even though x doesn't appear anywhere in the equation?</p>
           <div class="hint-box" id="hint-qf7">No matter what x you pick, how many y-values does this equation give?</div>
           <div class="mcq-options">
@@ -1002,6 +1032,20 @@ f(4) = 11</div>
           </div>
           <div class="feedback" id="fb-qf7"></div>
           <div class="scaffold-box" id="scaffold-qf7">Every x-value still gives exactly one y-value — always 9. That's still a function, just a constant one. Compare this to x = 6 (or any vertical line): that's NOT a function, because one single x-value would have to map to every possible y at once.</div>
+        </div>
+
+        <div class="qblock" id="block-qf8" data-group="func">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 18</span><span class="think-badge">💭 Think</span><button class="hint-btn" data-hint-for="qf8">💡 Hint</button></div>
+          <p class="qprompt">A vending machine takes a code and gives out one specific snack. Is "code → snack" a function? What if two different codes could give the same snack — does that change your answer?</p>
+          <div class="hint-box" id="hint-qf8">The function rule only cares whether ONE input ever gives more than one output. Does two different inputs giving the SAME output break that rule?</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="qf8" data-correct="true">Yes — many-to-one mappings are still functions</button>
+            <button class="opt-btn" data-qid="qf8" data-correct="false">No, two codes can't give the same snack</button>
+            <button class="opt-btn" data-qid="qf8" data-correct="false">No, vending machines can never be functions</button>
+            <button class="opt-btn" data-qid="qf8" data-correct="false">Only if every code gives a different snack</button>
+          </div>
+          <div class="feedback" id="fb-qf8"></div>
+          <div class="scaffold-box" id="scaffold-qf8">A function only breaks when one input maps to more than one output. Several different codes giving the same snack is perfectly fine — that's called "many-to-one", and it's still a valid function. It would only stop being a function if pressing the SAME code sometimes gave different snacks.</div>
         </div>
 
       </div>
@@ -1187,7 +1231,7 @@ x = 3</div>
       <div class="qgrid" style="margin-top:1.6rem;">
 
         <div class="qblock" id="block-ql1" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 16</span><button class="hint-btn" data-hint-for="ql1">💡 Hint</button></div>
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 19</span><button class="hint-btn" data-hint-for="ql1">💡 Hint</button></div>
           <p class="qprompt">For y = 3x − 2, find y when x = 4.</p>
           <div class="hint-box" id="hint-ql1">What do you get when you substitute x = 4 into y = 3x − 2?</div>
           <div class="numeric-row">
@@ -1201,7 +1245,7 @@ y = 10</div>
         </div>
 
         <div class="qblock" id="block-ql2" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 17</span><button class="hint-btn" data-hint-for="ql2">💡 Hint</button></div>
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 20</span><button class="hint-btn" data-hint-for="ql2">💡 Hint</button></div>
           <p class="qprompt">For y = −2x + 5, find y when x = −3.</p>
           <div class="hint-box" id="hint-ql2">There are two negative signs in this substitution — what happens when a negative multiplies a negative?</div>
           <div class="numeric-row">
@@ -1215,7 +1259,7 @@ y = 11</div>
         </div>
 
         <div class="qblock" id="block-ql3" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 18</span><button class="hint-btn" data-hint-for="ql3">💡 Hint</button></div>
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 21</span><button class="hint-btn" data-hint-for="ql3">💡 Hint</button></div>
           <p class="qprompt">For y = <span class="stacked-frac"><span class="frac-num">1</span><span class="frac-den">2</span></span>x + 4, find y when x = 6.</p>
           <div class="hint-box" id="hint-ql3">What is half of 6?</div>
           <div class="numeric-row">
@@ -1229,7 +1273,7 @@ y = 7</div>
         </div>
 
         <div class="qblock" id="block-ql4" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 19</span><button class="hint-btn" data-hint-for="ql4">💡 Hint</button></div>
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 22</span><button class="hint-btn" data-hint-for="ql4">💡 Hint</button></div>
           <p class="qprompt">The equation y = mx + 5 passes through (0, 5) no matter what m is. What is its y-intercept, c?</p>
           <div class="hint-box" id="hint-ql4">In y = mx + c, which part of the equation never changes, no matter what x is?</div>
           <div class="numeric-row">
@@ -1241,7 +1285,7 @@ y = 7</div>
         </div>
 
         <div class="qblock" id="block-ql5" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 20</span><button class="hint-btn" data-hint-for="ql5">💡 Hint</button></div>
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 23</span><button class="hint-btn" data-hint-for="ql5">💡 Hint</button></div>
           <p class="qprompt">Which of these is a linear equation in x and y?</p>
           <div class="hint-box" id="hint-ql5">For an equation to be considered linear, it must fit the general form y = mx + c. Does this equation match that form?</div>
           <div class="mcq-options">
@@ -1255,7 +1299,7 @@ y = 7</div>
         </div>
 
         <div class="qblock" id="block-ql6" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 21</span><button class="hint-btn" data-hint-for="ql6">💡 Hint</button></div>
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 24</span><button class="hint-btn" data-hint-for="ql6">💡 Hint</button></div>
           <p class="qprompt">For y = 5x − 3, identify the gradient, m.</p>
           <div class="hint-box" id="hint-ql6">In y = mx + c, which letter represents the gradient — and what number is in that position here?</div>
           <div class="numeric-row">
@@ -1268,7 +1312,7 @@ m = 5</div>
         </div>
 
         <div class="qblock" id="block-ql7" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 22</span><button class="hint-btn" data-hint-for="ql7">💡 Hint</button></div>
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 25</span><button class="hint-btn" data-hint-for="ql7">💡 Hint</button></div>
           <p class="qprompt">Using the same equation, y = 5x − 3, identify the y-intercept, c.</p>
           <div class="hint-box" id="hint-ql7">In y = mx + c, which letter represents the y-intercept — and what number is in that position here?</div>
           <div class="numeric-row">
@@ -1281,7 +1325,7 @@ c = −3</div>
         </div>
 
         <div class="qblock" id="block-ql8" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 23</span><button class="hint-btn" data-hint-for="ql8">💡 Hint</button></div>
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 26</span><button class="hint-btn" data-hint-for="ql8">💡 Hint</button></div>
           <p class="qprompt">For y = 4x − 3, find x when y = 13.</p>
           <div class="hint-box" id="hint-ql8">Substitute y = 13 into the equation — what do you get left to solve for x?</div>
           <div class="numeric-row">
@@ -1296,7 +1340,7 @@ x = 4</div>
         </div>
 
         <div class="qblock" id="block-ql9" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 24</span><button class="hint-btn" data-hint-for="ql9">💡 Hint</button></div>
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 27</span><button class="hint-btn" data-hint-for="ql9">💡 Hint</button></div>
           <p class="qprompt">Rearrange 2y = 6x + 8 into the form y = mx + c. What is the gradient, m?</p>
           <div class="hint-box" id="hint-ql9">Every term is currently multiplied by 2. What do you need to do to both sides to get y on its own?</div>
           <div class="numeric-row">
@@ -1311,7 +1355,7 @@ m = 3</div>
         </div>
 
         <div class="qblock" id="block-ql10" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 25</span><button class="hint-btn" data-hint-for="ql10">💡 Hint</button></div>
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 28</span><button class="hint-btn" data-hint-for="ql10">💡 Hint</button></div>
           <p class="qprompt">Rearrange 4y = 8x − 12 into the form y = mx + c. What is the y-intercept, c?</p>
           <div class="hint-box" id="hint-ql10">Every term is currently multiplied by 4. What do you need to do to both sides to get y on its own?</div>
           <div class="numeric-row">
@@ -1326,7 +1370,7 @@ c = −3</div>
         </div>
 
         <div class="qblock" id="block-ql11" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 26</span><button class="hint-btn" data-hint-for="ql11">💡 Hint</button></div>
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 29</span><button class="hint-btn" data-hint-for="ql11">💡 Hint</button></div>
           <p class="qprompt">Rearrange 3y − 6x = 12 into the form y = mx + c. What is the gradient, m?</p>
           <div class="hint-box" id="hint-ql11">First move the −6x to the other side of the equation. Then deal with the 3 in front of y.</div>
           <div class="numeric-row">
@@ -1339,6 +1383,20 @@ c = −3</div>
 Divide every term by 3:
 y = 2x + 4
 m = 2</div>
+        </div>
+
+        <div class="qblock" id="block-ql12" data-group="linear">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 30</span><span class="think-badge">💭 Think</span><button class="hint-btn" data-hint-for="ql12">💡 Hint</button></div>
+          <p class="qprompt">Two students rearrange 4y = 8x + 12 differently, but both end up claiming y = 2x + 3 is correct. How could you check who's right without redoing all the algebra from scratch?</p>
+          <div class="hint-box" id="hint-ql12">If two equations are truly equivalent, what should happen when you substitute the same x-value into both of them?</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="ql12" data-correct="true">Substitute a test x-value into both equations</button>
+            <button class="opt-btn" data-qid="ql12" data-correct="false">Just trust whoever wrote their working out neater</button>
+            <button class="opt-btn" data-qid="ql12" data-correct="false">Rearranging always gives the same answer, so there's nothing to check</button>
+            <button class="opt-btn" data-qid="ql12" data-correct="false">Compare how many steps each student used</button>
+          </div>
+          <div class="feedback" id="fb-ql12"></div>
+          <div class="scaffold-box" id="scaffold-ql12">Try x = 1 in both. Original: 4y = 8(1) + 12 = 20, so y = 5. Rearranged: y = 2(1) + 3 = 5. Both give y = 5 — they agree, which confirms the rearrangement satisfies the original equation.</div>
         </div>
 
       </div>
@@ -1354,7 +1412,7 @@ m = 2</div>
       </div>
 
       <div class="eyebrow">Part 1 of 3 complete</div>
-      <div class="score-banner">Your score: <strong id="finalScore">0 / 28</strong></div>
+      <div class="score-banner">Your score: <strong id="finalScore">0 / 32</strong></div>
       <h2 style="margin-top:1.2rem;">Everything you've covered so far</h2>
 
       <div class="summary-grid stagger">
@@ -1404,10 +1462,10 @@ m = 2</div>
   const slideIds = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11','s12','s13','s14'];
   const darkSlides = new Set(['s1','s3','s5','s6','s9','s10','s14']);
   const chipGroups = [
-    {group:'cart', label:'A. Coordinates', target:'s5', total:6},
-    {group:'plotb', label:'B. Plot &amp; Draw', target:'s7', total:4},
-    {group:'func', label:'C. Functions', target:'s9', total:7},
-    {group:'linear', label:'D. Linear Eqns', target:'s13', total:11}
+    {group:'cart', label:'A. Coordinates', target:'s5', total:7},
+    {group:'plotb', label:'B. Plot &amp; Draw', target:'s7', total:5},
+    {group:'func', label:'C. Functions', target:'s9', total:8},
+    {group:'linear', label:'D. Linear Eqns', target:'s13', total:12}
   ];
   const state = { answered:{}, score:0, groupCount:{} };
   chipGroups.forEach(g => state.groupCount[g.group] = 0);
