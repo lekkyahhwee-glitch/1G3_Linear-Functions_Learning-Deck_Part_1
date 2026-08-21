@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Linear Functions and Graphs — Part 1 of 3</title>
+<title>Linear Functions and Graphs — Part 1A of 4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -32,6 +32,7 @@
     --fs-body: clamp(0.96rem, 1.1vw, 1.08rem);
     --fs-label: 0.76rem;
     --topbar-h: 56px;
+    --toolbar-h: 48px;
   }
 
   *{ box-sizing:border-box; margin:0; padding:0; }
@@ -44,21 +45,43 @@
   ::selection{ background:var(--gold); color:var(--ink); }
 
   .deck{
-    height:100vh; height:100dvh; overflow-y:scroll; scroll-snap-type:y proximity; scroll-behavior:smooth;
-    -webkit-overflow-scrolling:touch;
+    height:calc(100vh - var(--topbar-h) - var(--toolbar-h)); height:calc(100dvh - var(--topbar-h) - var(--toolbar-h));
+    margin-top:var(--topbar-h);
+    overflow:hidden; position:relative;
   }
-  .deck::-webkit-scrollbar{ display:none; }
 
   .slide{
-    min-height:100vh; min-height:100dvh; width:100%;
-    scroll-snap-align:start; scroll-snap-stop:always;
-    position:relative; display:flex; flex-direction:column; justify-content:center;
-    padding: calc(var(--topbar-h) + 4.5vh) 7.5vw calc(6vh + 60px) 7.5vw;
-    overflow:hidden;
+    display:none; flex-direction:column; height:100%; width:100%;
   }
+  .slide.active{ display:flex; }
   .slide.dark{ background:var(--ink); color:var(--paper-on-dark); }
   .slide.light{ background:var(--paper); color:var(--ink); }
-  .slide.dense{ justify-content:flex-start; padding-top:calc(var(--topbar-h) + 6vh); }
+
+  .slide-scroll{
+    flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    padding: 4.5vh 7.5vw 2.5vh;
+  }
+  .slide.dense .slide-scroll{ padding-top:3vh; }
+
+  .slide-footer{
+    flex-shrink:0; padding:0.9rem 7.5vw calc(0.9rem + env(safe-area-inset-bottom));
+    border-top:1px solid var(--line-dark);
+    display:flex; align-items:center; justify-content:space-between; gap:0.8rem;
+  }
+  .slide.light .slide-footer{ border-top-color:var(--line); }
+  .progress-note{ font-family:var(--font-mono); font-size:0.76rem; opacity:0.6; }
+  .next-btn{
+    font-family:var(--font-display); font-weight:700; font-size:0.95rem; background:var(--coral); color:#fff;
+    border:none; border-radius:12px; padding:0.85rem 1.5rem; cursor:pointer; min-height:48px;
+    transition:transform 0.12s ease, opacity 0.12s ease;
+  }
+  .next-btn:active{ transform:scale(0.97); }
+  .next-btn:disabled{ opacity:0.45; cursor:default; }
+  .back-btn{
+    font-family:var(--font-display); font-weight:600; font-size:0.9rem; background:transparent; color:inherit;
+    border:1px solid var(--line-dark); border-radius:12px; padding:0.85rem 1.2rem; cursor:pointer; min-height:48px; opacity:0.85;
+  }
+  .slide.light .back-btn{ border-color:var(--line); }
 
   .content-wrap{ max-width:980px; width:100%; margin:0 auto; }
 
@@ -99,6 +122,15 @@
   }
   .tb-nav-btn:hover{ background:var(--coral); color:#fff; border-color:var(--coral); }
   body.on-dark .tb-nav-btn{ color:var(--paper-on-dark); border-color:var(--line-dark); }
+  /* custom confirm modal (replaces browser confirm(), which is blocked in sandboxed embeds) */
+  .modal-overlay{ position:fixed; inset:0; background:rgba(15,27,46,0.55); display:none; align-items:center; justify-content:center; z-index:500; padding:6vw; }
+  .modal-overlay.show{ display:flex; }
+  .modal-card{ background:var(--paper); color:var(--ink); border-radius:14px; padding:1.6rem 1.5rem; max-width:360px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+  .modal-card h3{ font-size:1.05rem; margin-bottom:0.6rem; }
+  .modal-card p{ font-size:0.9rem; line-height:1.5; opacity:0.85; margin-bottom:1.2rem; }
+  .modal-actions{ display:flex; gap:0.7rem; justify-content:flex-end; }
+  .modal-btn{ padding:0.6rem 1.1rem; border-radius:8px; font-size:0.86rem; font-weight:600; cursor:pointer; border:1px solid var(--line); background:transparent; color:var(--ink); }
+  .modal-btn.danger{ background:var(--coral); border-color:var(--coral); color:#fff; }
   .tb-counter{ flex-shrink:0; font-family:var(--font-mono); font-size:0.74rem; display:flex; align-items:center; gap:0.5rem; white-space:nowrap; }
   .tb-counter .track{ position:relative; width:34px; height:2px; background:var(--line); }
   body.on-dark .tb-counter .track{ background:var(--line-dark); }
@@ -215,13 +247,13 @@
 
   /* ---------- Flip-card definitions ---------- */
   .flip-card-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:1rem; margin:1.4rem 0; }
-  .flip-card{ perspective:1000px; cursor:pointer; height:150px; }
-  .flip-card-inner{ position:relative; width:100%; height:100%; transition:transform 0.5s; transform-style:preserve-3d; }
+  .flip-card{ perspective:1000px; cursor:pointer; height:150px; position:relative; }
+  .flip-card-inner{ position:relative; width:100%; height:100%; transition:transform 0.5s; transform-style:preserve-3d; border-radius:14px; }
   .flip-card.flipped .flip-card-inner{ transform:rotateY(180deg); }
   .flip-card-front, .flip-card-back{ position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
     border-radius:14px; padding:1.1rem; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
-  .flip-card-front{ background:rgba(251,248,241,0.06); border:1px solid var(--line-dark); }
-  .slide.light .flip-card-front{ background:rgba(15,27,46,0.04); border-color:var(--line); }
+  .flip-card-front{ background:#FFB627; border:2px solid #B3790A; color:#241900; }
+  .flip-card-front .flip-tap-hint{ opacity:0.75; }
   .flip-card-back{ background:var(--mint); color:#fff; transform:rotateY(180deg); }
   .flip-icon{ font-size:1.3rem; margin-bottom:0.5rem; display:block; }
   .flip-question{ font-family:var(--font-display); font-weight:700; font-size:0.98rem; line-height:1.3; }
@@ -231,6 +263,36 @@
   .flip-card-worked .flip-card-back{ align-items:flex-start; text-align:left; }
   .flip-worked-steps{ font-family:var(--font-mono); font-size:0.82rem; line-height:1.6; white-space:pre-line; width:100%; }
   .flip-card-wide{ max-width:420px; height:170px; }
+
+  /* the pulse: loud — big spread, high peak opacity, hot-pink glow against the amber cover, plus a gentle scale bounce */
+  .flip-card:not(.flipped){ animation:cardBounce 1.8s ease-in-out infinite; }
+  .flip-card:not(.flipped)::before{
+    content:''; position:absolute; inset:-4px; border-radius:18px; z-index:-1;
+    box-shadow:0 0 0 0 rgba(255,45,133,0.75);
+    animation:cardPulse 1.8s ease-out infinite;
+  }
+  @keyframes cardPulse{
+    0%{ box-shadow:0 0 0 0 rgba(255,45,133,0.75); }
+    60%{ box-shadow:0 0 0 22px rgba(255,45,133,0); }
+    100%{ box-shadow:0 0 0 0 rgba(255,45,133,0); }
+  }
+  @keyframes cardBounce{ 0%,50%,100%{ transform:scale(1); } 25%{ transform:scale(1.035); } }
+  .flip-card.flipped::before{ animation:none; box-shadow:none; }
+
+  /* ---------- Bold highlighted key terms + important-info callout box ---------- */
+  .key-term{
+    font-weight:700; background:linear-gradient(180deg, transparent 52%, rgba(255,182,39,0.65) 52%);
+    padding:0 0.05em;
+  }
+  .slide.light .key-term{ background:linear-gradient(180deg, transparent 52%, rgba(255,182,39,0.55) 52%); }
+  .callout-box{
+    background:#FF5A45; border:2px solid #B32E1C; border-radius:10px; color:#fff;
+    padding:0.9rem 1.1rem; margin:1rem 0; font-size:0.9rem; line-height:1.6;
+  }
+  .callout-box .callout-label{ font-family:var(--font-mono); font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; opacity:0.92; font-weight:700; display:block; margin-bottom:0.4rem; }
+  .callout-box .key-term{ background:linear-gradient(180deg, transparent 52%, rgba(255,255,255,0.55) 52%); color:#fff; }
+
+
 
   /* ---------- Coloured quadrants ---------- */
   .quad-cell.quad-1{ background:rgba(52,211,153,0.18); }
@@ -433,21 +495,32 @@
 
   @media (max-width:640px){
     .tb-chips{ display:none; }
-    .slide{ padding-left:6vw; padding-right:6vw; }
+    .slide-scroll{ padding-left:6vw; padding-right:6vw; }
+    .slide-footer{ padding-left:6vw; padding-right:6vw; }
   }
 </style>
 </head>
 <body>
 
 <div class="laser-dot" id="laserDot"></div>
+<div class="modal-overlay" id="resetModal">
+  <div class="modal-card">
+    <h3>Reset all progress?</h3>
+    <p>This clears every answer and score on this workbook. This can't be undone.</p>
+    <div class="modal-actions">
+      <button class="modal-btn" id="resetCancelBtn">Cancel</button>
+      <button class="modal-btn danger" id="resetConfirmBtn">Reset</button>
+    </div>
+  </div>
+</div>
 <button class="laser-toggle" id="laserToggle" title="Toggle laser pointer">🔴</button>
 <div class="math-toolbar" id="mathToolbar"></div>
 
 <div class="top-bar" id="topBar">
   <button class="tb-nav-btn" id="prevBtn" aria-label="previous">←</button>
-  <div class="tb-counter"><span id="slideNum">1</span>/<span id="slideTotal">14</span><span class="track"><span class="fill" id="counterFill"></span></span></div>
+  <div class="tb-counter"><span id="slideNum">1</span>/<span id="slideTotal">11</span><span class="track"><span class="fill" id="counterFill"></span></span></div>
   <div class="tb-chips" id="tbChips"></div>
-  <div class="tb-score" id="tbScore">Score 0/32</div>
+  <div class="tb-score" id="tbScore">Score 0/28</div>
   <button class="tb-nav-btn" id="resetProgressBtn" aria-label="reset progress" title="Reset progress">⟲</button>
   <button class="tb-nav-btn" id="nextBtn" aria-label="next">→</button>
 </div>
@@ -456,8 +529,9 @@
 
 <!-- SLIDE 1 — TITLE -->
   <section class="slide dark" id="s1">
+    <div class="slide-scroll">
     <div class="content-wrap">
-      <div class="title-tag">Sec 1 · Chapter 11 · Maths Workbook · Part 1 of 3</div>
+      <div class="title-tag">Sec 1 · Chapter 11 · Maths Workbook · Part 1A of 4</div>
       <h1>Linear Functions<br>and Graphs</h1>
       <p class="lede" style="margin-top:1rem;">Have you ever wondered how so many airplanes fly in the sky without crashing into each other? Air traffic controllers track every plane using coordinates on a grid — the same idea behind every graph you're about to draw.</p>
       <div class="coord-tease" id="coordTease" onclick="this.classList.toggle('revealed')">
@@ -467,9 +541,17 @@
         <span class="reveal-original">← its exact position, as an ordered pair</span>
       </div>
     </div>
+    </div>
+    <div class="slide-footer">
+      <span></span>
+      <span class="progress-note">Page 1 / 11</span>
+      <button class="next-btn" onclick="showSlide('s2')">Next &rarr;</button>
+    </div>
+  
   </section>
 <!-- SLIDE 2 — LOs -->
   <section class="slide light" id="s2">
+    <div class="slide-scroll">
     <div class="content-wrap stagger">
       <div class="eyebrow">Learning objectives</div>
       <h2>Six skills that build on each other, one grid at a time</h2>
@@ -482,16 +564,29 @@
         <div class="lo-item"><div class="lo-marker">E</div><div class="lo-text">Find the gradient and y-intercept of linear graphs.</div></div>
         <div class="lo-item"><div class="lo-marker">F</div><div class="lo-text">Solve problems involving linear functions in real-world contexts.</div></div>
       </div>
-      <div class="pace-note">⏱️ This is Part 1 of 3. Today's session covers A, B, C and D — we'll continue with E and F over the next couple of sessions.</div>
+      <div class="pace-note">⏱️ This is Part 1A of 4. Today's session covers A and B — we'll continue with C and D in Part 1B, then E and F after that.</div>
     </div>
+    </div>
+    <div class="slide-footer">
+      <button class="back-btn" onclick="showSlide('s1')">&larr; Back</button>
+      <span class="progress-note">Page 2 / 11</span>
+      <button class="next-btn" onclick="showSlide('s3')">Next &rarr;</button>
+    </div>
+  
   </section>
 <!-- SLIDE 3 — WHAT YOU'LL SEE ON EVERY PAGE -->
   <section class="slide dark dense" id="s3">
+    <div class="slide-scroll">
     <div class="content-wrap">
       <div class="eyebrow">Before you start</div>
       <h2>What you'll see on every page</h2>
       <p class="lede">This workbook works the same way from start to finish. Here's everything you'll run into along the way.</p>
       <div class="feature-grid stagger">
+        <div class="feature-card">
+          <span class="fc-icon">➡️</span>
+          <div class="fc-title">Next button</div>
+          <div class="fc-body">Each page has its own <strong>Next</strong> button at the bottom — work through everything on the page before moving on. Long pages scroll, but Next always stays put at the bottom.</div>
+        </div>
         <div class="feature-card">
           <span class="fc-icon">💡</span>
           <div class="fc-title">Hint button</div>
@@ -525,13 +620,21 @@
         <div class="feature-card">
           <span class="fc-icon">🔄</span>
           <div class="fc-title">Flip cards</div>
-          <div class="fc-body">Some definitions and worked examples are hidden behind flip cards. Tap to reveal, tap again to hide.</div>
+          <div class="fc-body">Some definitions and worked examples are hidden behind flip cards — the glowing ones haven't been opened yet. Tap to reveal, tap again to hide.</div>
         </div>
       </div>
     </div>
+    </div>
+    <div class="slide-footer">
+      <button class="back-btn" onclick="showSlide('s2')">&larr; Back</button>
+      <span class="progress-note">Page 3 / 11</span>
+      <button class="next-btn" onclick="showSlide('s4')">Next &rarr;</button>
+    </div>
+  
   </section>
 <!-- SLIDE 4 — HOOK -->
   <section class="slide light dense" id="s4">
+    <div class="slide-scroll">
     <div class="content-wrap">
       <div class="eyebrow">Spot the coordinates and graphs</div>
       <h2>You already meet these four every week. Tap each one.</h2>
@@ -562,13 +665,26 @@
         </div>
       </div>
     </div>
+    </div>
+    <div class="slide-footer">
+      <button class="back-btn" onclick="showSlide('s3')">&larr; Back</button>
+      <span class="progress-note">Page 4 / 11</span>
+      <button class="next-btn" onclick="showSlide('s5')">Next &rarr;</button>
+    </div>
+  
   </section>
 <!-- SLIDE 5 — (A) CARTESIAN COORDINATES concept + tool -->
   <section class="slide dark dense" id="s5">
+    <div class="slide-scroll">
     <div class="content-wrap">
       <div class="eyebrow">Section A — Cartesian Coordinates</div>
       <h2>Every point is an ordered pair (x, y)</h2>
-      <p class="lede">The horizontal <strong>x-axis</strong> and vertical <strong>y-axis</strong> cross at the <strong>origin O(0, 0)</strong>. A point's position is written as <strong>(x, y)</strong> — x tells you how far left/right, y tells you how far up/down. The two axes divide the plane into <strong>4 quadrants</strong>.</p>
+      <p class="lede">The horizontal <span class="key-term">x-axis</span> and vertical <span class="key-term">y-axis</span> cross at the <span class="key-term">origin O(0, 0)</span>. A point's position is written as <span class="key-term">(x, y)</span> — x tells you how far left/right, y tells you how far up/down. The two axes divide the plane into <span class="key-term">4 quadrants</span>.</p>
+
+      <div class="callout-box">
+        <span class="callout-label">⚠️ Easy to mix up</span>
+        The <span class="key-term">x-coordinate always comes first</span>, the <span class="key-term">y-coordinate always comes second</span> — (3, 5) and (5, 3) are two completely different points, even though they use the same two numbers.
+      </div>
 
       <div class="flip-card-grid">
         <div class="flip-card" onclick="this.classList.toggle('flipped')">
@@ -638,9 +754,17 @@
         </div>
       </div>
     </div>
+    </div>
+    <div class="slide-footer">
+      <button class="back-btn" onclick="showSlide('s4')">&larr; Back</button>
+      <span class="progress-note">Page 5 / 11</span>
+      <button class="next-btn" onclick="showSlide('s6')">Next &rarr;</button>
+    </div>
+  
   </section>
 <!-- SLIDE 6 — (A) practice -->
   <section class="slide dark dense" id="s6">
+    <div class="slide-scroll">
     <div class="content-wrap">
       <div class="eyebrow">Section A — Practice</div>
       <h2>Coordinates &amp; quadrants</h2>
@@ -760,20 +884,290 @@ Coordinates: (4, −3)</div>
 
       </div>
     </div>
+    </div>
+    <div class="slide-footer">
+      <button class="back-btn" onclick="showSlide('s5')">&larr; Back</button>
+      <span class="progress-note">Page 6 / 11</span>
+      <button class="next-btn" onclick="showSlide('s7')">Next &rarr;</button>
+    </div>
+  
   </section>
-<!-- SLIDE 7 — (B) PLOT & DRAW concept -->
-  <section class="slide light dense" id="s7">
+<!-- SLIDE 7 — (A) extra practice: plot individual points + read points off a diagram -->
+  <section class="slide dark dense" id="s7">
+    <div class="slide-scroll">
+    <div class="content-wrap">
+      <div class="eyebrow">Section A — Plot &amp; Read</div>
+      <h2>Plot it, then read it back</h2>
+      <p class="lede">Two more coordinate skills before we move on: plotting single points from scratch, and reading coordinates straight off a diagram someone else has already plotted.</p>
+
+      <div class="plot-activity">
+        <div class="plot-instructions">
+          <strong>Activity 1.</strong> Plot these four points — they don't need to line up, just place each one correctly: <span class="target-pill">A(4, 3)</span><span class="target-pill">B(−3, 5)</span><span class="target-pill">C(−5, −2)</span><span class="target-pill">D(2, −4)</span>
+        </div>
+        <div class="plot-body">
+          <div class="plot-svg-block"><svg id="plotSvgIndiv" viewBox="0 0 350 350"><g id="plotIndiv-grid"></g><g id="plotIndiv-dyn"></g></svg></div>
+          <div class="plot-status">
+            <div class="plot-progress" id="plotIndiv-progress">0 / 4 points plotted</div>
+          </div>
+        </div>
+        <div class="plot-followup qgrid">
+          <div class="qblock" id="block-qcx1" data-group="coordx">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 8</span><button class="hint-btn" data-hint-for="qcx1">💡 Hint</button></div>
+            <p class="qprompt">Which of your four plotted points sits in Quadrant III?</p>
+            <div class="hint-box" id="hint-qcx1">Quadrant III needs both coordinates negative — which of A, B, C, D has both x and y negative?</div>
+            <div class="mcq-options">
+              <button class="opt-btn" data-qid="qcx1" data-correct="false">A (4, 3)</button>
+              <button class="opt-btn" data-qid="qcx1" data-correct="false">B (−3, 5)</button>
+              <button class="opt-btn" data-qid="qcx1" data-correct="true">C (−5, −2)</button>
+              <button class="opt-btn" data-qid="qcx1" data-correct="false">D (2, −4)</button>
+            </div>
+            <div class="feedback" id="fb-qcx1"></div>
+            <div class="scaffold-box" id="scaffold-qcx1">C = (−5, −2): x is negative and y is negative, so (−, −) → Quadrant III.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="plot-activity">
+        <div class="plot-instructions">
+          <strong>Activity 2.</strong> These five points are already plotted for you. Read off each one's coordinates and type them in.
+        </div>
+        <div class="callout-box">
+          <span class="callout-label">⚠️ Easy to mix up</span>
+          Count how far <span class="key-term">left/right first</span> (that's x), <span class="key-term">then up/down</span> (that's y) — reading a point works exactly like plotting one, just in reverse.
+        </div>
+        <div class="plot-body">
+          <div class="plot-svg-block"><svg viewBox="0 0 350 350"><g id="readpts-grid"></g>
+            <circle cx="220" cy="115" r="5" style="fill:var(--mint)"/><text x="228" y="110" font-size="13" font-weight="700" fill="var(--mint)">P</text>
+            <circle cx="85" cy="130" r="5" style="fill:var(--coral)"/><text x="93" y="125" font-size="13" font-weight="700" fill="var(--coral)">Q</text>
+            <circle cx="115" cy="250" r="5" style="fill:var(--gold)"/><text x="123" y="245" font-size="13" font-weight="700" fill="var(--gold)">R</text>
+            <circle cx="250" cy="205" r="5" style="fill:var(--violet)"/><text x="258" y="200" font-size="13" font-weight="700" fill="var(--violet)">S</text>
+            <circle cx="175" cy="85" r="5" style="fill:#fff"/><text x="183" y="80" font-size="13" font-weight="700" fill="#fff">T</text>
+          </svg></div>
+        </div>
+        <div class="plot-followup qgrid">
+          <div class="qblock" id="block-rpP" data-group="coordx">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 9</span><button class="hint-btn" data-hint-for="rpP">💡 Hint</button></div>
+            <p class="qprompt">State the coordinates of point P.</p>
+            <div class="hint-box" id="hint-rpP">How far right of the origin, and how far up?</div>
+            <div class="numeric-row">
+              ( <input type="text" inputmode="decimal" id="rpP-x-ans" placeholder="x" style="width:44px;"> , <input type="text" inputmode="decimal" id="rpP-y-ans" placeholder="y" style="width:44px;"> )
+              <button class="check-btn" onclick="checkPointCoord('rpP',3,4,'coordx')">Check</button>
+            </div>
+            <div class="feedback" id="fb-rpP"></div>
+            <div class="scaffold-box" id="scaffold-rpP">P is 3 right, 4 up from the origin → (3, 4)</div>
+          </div>
+          <div class="qblock" id="block-rpQ" data-group="coordx">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 10</span><button class="hint-btn" data-hint-for="rpQ">💡 Hint</button></div>
+            <p class="qprompt">State the coordinates of point Q.</p>
+            <div class="hint-box" id="hint-rpQ">Is Q to the left or right of the origin? Above or below?</div>
+            <div class="numeric-row">
+              ( <input type="text" inputmode="decimal" id="rpQ-x-ans" placeholder="x" style="width:44px;"> , <input type="text" inputmode="decimal" id="rpQ-y-ans" placeholder="y" style="width:44px;"> )
+              <button class="check-btn" onclick="checkPointCoord('rpQ',-6,3,'coordx')">Check</button>
+            </div>
+            <div class="feedback" id="fb-rpQ"></div>
+            <div class="scaffold-box" id="scaffold-rpQ">Q is 6 left, 3 up from the origin → (−6, 3)</div>
+          </div>
+          <div class="qblock" id="block-rpR" data-group="coordx">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 11</span><button class="hint-btn" data-hint-for="rpR">💡 Hint</button></div>
+            <p class="qprompt">State the coordinates of point R.</p>
+            <div class="hint-box" id="hint-rpR">R is below the x-axis — what sign should its y-coordinate have?</div>
+            <div class="numeric-row">
+              ( <input type="text" inputmode="decimal" id="rpR-x-ans" placeholder="x" style="width:44px;"> , <input type="text" inputmode="decimal" id="rpR-y-ans" placeholder="y" style="width:44px;"> )
+              <button class="check-btn" onclick="checkPointCoord('rpR',-4,-5,'coordx')">Check</button>
+            </div>
+            <div class="feedback" id="fb-rpR"></div>
+            <div class="scaffold-box" id="scaffold-rpR">R is 4 left, 5 down from the origin → (−4, −5)</div>
+          </div>
+          <div class="qblock" id="block-rpS" data-group="coordx">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 12</span><button class="hint-btn" data-hint-for="rpS">💡 Hint</button></div>
+            <p class="qprompt">State the coordinates of point S.</p>
+            <div class="hint-box" id="hint-rpS">S is right of the origin and below the x-axis.</div>
+            <div class="numeric-row">
+              ( <input type="text" inputmode="decimal" id="rpS-x-ans" placeholder="x" style="width:44px;"> , <input type="text" inputmode="decimal" id="rpS-y-ans" placeholder="y" style="width:44px;"> )
+              <button class="check-btn" onclick="checkPointCoord('rpS',5,-2,'coordx')">Check</button>
+            </div>
+            <div class="feedback" id="fb-rpS"></div>
+            <div class="scaffold-box" id="scaffold-rpS">S is 5 right, 2 down from the origin → (5, −2)</div>
+          </div>
+          <div class="qblock" id="block-rpT" data-group="coordx">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 13</span><button class="hint-btn" data-hint-for="rpT">💡 Hint</button></div>
+            <p class="qprompt">State the coordinates of point T.</p>
+            <div class="hint-box" id="hint-rpT">T hasn't moved left or right from the origin at all — what does that make its x-coordinate?</div>
+            <div class="numeric-row">
+              ( <input type="text" inputmode="decimal" id="rpT-x-ans" placeholder="x" style="width:44px;"> , <input type="text" inputmode="decimal" id="rpT-y-ans" placeholder="y" style="width:44px;"> )
+              <button class="check-btn" onclick="checkPointCoord('rpT',0,6,'coordx')">Check</button>
+            </div>
+            <div class="feedback" id="fb-rpT"></div>
+            <div class="scaffold-box" id="scaffold-rpT">T is directly above the origin, 0 left/right → (0, 6)</div>
+          </div>
+          <div class="qblock" id="block-qcx2" data-group="coordx">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 14</span><span class="think-badge">💭 Think</span><button class="hint-btn" data-hint-for="qcx2">💡 Hint</button></div>
+            <p class="qprompt">Which of the five points, P–T, lies exactly on an axis?</p>
+            <div class="hint-box" id="hint-qcx2">Look for the point whose x-coordinate — or y-coordinate — is 0.</div>
+            <div class="mcq-options">
+              <button class="opt-btn" data-qid="qcx2" data-correct="false">P</button>
+              <button class="opt-btn" data-qid="qcx2" data-correct="false">Q</button>
+              <button class="opt-btn" data-qid="qcx2" data-correct="false">R</button>
+              <button class="opt-btn" data-qid="qcx2" data-correct="true">T</button>
+            </div>
+            <div class="feedback" id="fb-qcx2"></div>
+            <div class="scaffold-box" id="scaffold-qcx2">T = (0, 6) — x = 0 means it hasn't moved left or right from the origin, so it sits exactly on the y-axis.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="slide-footer">
+      <button class="back-btn" onclick="showSlide('s6')">&larr; Back</button>
+      <span class="progress-note">Page 7 / 11</span>
+      <button class="next-btn" onclick="showSlide('s8')">Next &rarr;</button>
+    </div>
+  
+  </section>
+<!-- SLIDE 8 — (A) coordinate hunt (themed grid) -->
+  <section class="slide dark dense" id="s8">
+    <div class="slide-scroll">
+    <div class="content-wrap">
+      <div class="eyebrow">Section A — Coordinate Hunt 🎡</div>
+      <h2>Find every item on the carnival grid</h2>
+      <p class="lede">The school carnival has set up five stalls on a coordinate grid. Read each one's position, then work the other way round too.</p>
+
+      <div class="plot-activity">
+        <div class="plot-body">
+          <div class="plot-svg-block"><svg viewBox="0 0 350 350"><g id="hunt-grid"></g>
+            <text x="205" y="70" font-size="20" text-anchor="middle">🎡</text>
+            <text x="115" y="100" font-size="20" text-anchor="middle">🍿</text>
+            <text x="250" y="145" font-size="20" text-anchor="middle">🎯</text>
+            <text x="130" y="235" font-size="20" text-anchor="middle">🍭</text>
+            <text x="265" y="220" font-size="20" text-anchor="middle">🎪</text>
+          </svg></div>
+        </div>
+        <div class="plot-followup qgrid">
+          <div class="qblock" id="block-hnA" data-group="hunt">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 15</span><button class="hint-btn" data-hint-for="hnA">💡 Hint</button></div>
+            <p class="qprompt">Write the ordered pair for the 🎡 Ferris wheel.</p>
+            <div class="hint-box" id="hint-hnA">Count across from the origin first, then up.</div>
+            <div class="numeric-row">
+              ( <input type="text" inputmode="decimal" id="hnA-x-ans" placeholder="x" style="width:44px;"> , <input type="text" inputmode="decimal" id="hnA-y-ans" placeholder="y" style="width:44px;"> )
+              <button class="check-btn" onclick="checkPointCoord('hnA',2,7,'hunt')">Check</button>
+            </div>
+            <div class="feedback" id="fb-hnA"></div>
+            <div class="scaffold-box" id="scaffold-hnA">🎡 is 2 right, 7 up from the origin → (2, 7)</div>
+          </div>
+          <div class="qblock" id="block-hnB" data-group="hunt">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 16</span><button class="hint-btn" data-hint-for="hnB">💡 Hint</button></div>
+            <p class="qprompt">Write the ordered pair for the 🍿 popcorn stall.</p>
+            <div class="hint-box" id="hint-hnB">Is it left or right of the origin?</div>
+            <div class="numeric-row">
+              ( <input type="text" inputmode="decimal" id="hnB-x-ans" placeholder="x" style="width:44px;"> , <input type="text" inputmode="decimal" id="hnB-y-ans" placeholder="y" style="width:44px;"> )
+              <button class="check-btn" onclick="checkPointCoord('hnB',-4,5,'hunt')">Check</button>
+            </div>
+            <div class="feedback" id="fb-hnB"></div>
+            <div class="scaffold-box" id="scaffold-hnB">🍿 is 4 left, 5 up from the origin → (−4, 5)</div>
+          </div>
+          <div class="qblock" id="block-hnC" data-group="hunt">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 17</span><button class="hint-btn" data-hint-for="hnC">💡 Hint</button></div>
+            <p class="qprompt">Write the ordered pair for the 🎯 dart board.</p>
+            <div class="hint-box" id="hint-hnC">Both coordinates are positive here.</div>
+            <div class="numeric-row">
+              ( <input type="text" inputmode="decimal" id="hnC-x-ans" placeholder="x" style="width:44px;"> , <input type="text" inputmode="decimal" id="hnC-y-ans" placeholder="y" style="width:44px;"> )
+              <button class="check-btn" onclick="checkPointCoord('hnC',5,2,'hunt')">Check</button>
+            </div>
+            <div class="feedback" id="fb-hnC"></div>
+            <div class="scaffold-box" id="scaffold-hnC">🎯 is 5 right, 2 up from the origin → (5, 2)</div>
+          </div>
+          <div class="qblock" id="block-hnD" data-group="hunt">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 18</span><button class="hint-btn" data-hint-for="hnD">💡 Hint</button></div>
+            <p class="qprompt">Write the ordered pair for the 🍭 candy floss stall.</p>
+            <div class="hint-box" id="hint-hnD">Both coordinates are negative here.</div>
+            <div class="numeric-row">
+              ( <input type="text" inputmode="decimal" id="hnD-x-ans" placeholder="x" style="width:44px;"> , <input type="text" inputmode="decimal" id="hnD-y-ans" placeholder="y" style="width:44px;"> )
+              <button class="check-btn" onclick="checkPointCoord('hnD',-3,-4,'hunt')">Check</button>
+            </div>
+            <div class="feedback" id="fb-hnD"></div>
+            <div class="scaffold-box" id="scaffold-hnD">🍭 is 3 left, 4 down from the origin → (−3, −4)</div>
+          </div>
+          <div class="qblock" id="block-hnE" data-group="hunt">
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 19</span><button class="hint-btn" data-hint-for="hnE">💡 Hint</button></div>
+            <p class="qprompt">Write the ordered pair for the 🎪 big top tent.</p>
+            <div class="hint-box" id="hint-hnE">It's right of the origin, but below the x-axis.</div>
+            <div class="numeric-row">
+              ( <input type="text" inputmode="decimal" id="hnE-x-ans" placeholder="x" style="width:44px;"> , <input type="text" inputmode="decimal" id="hnE-y-ans" placeholder="y" style="width:44px;"> )
+              <button class="check-btn" onclick="checkPointCoord('hnE',6,-3,'hunt')">Check</button>
+            </div>
+            <div class="feedback" id="fb-hnE"></div>
+            <div class="scaffold-box" id="scaffold-hnE">🎪 is 6 right, 3 down from the origin → (6, −3)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="qgrid" style="margin-top:1rem;">
+        <div class="qblock" id="block-hq1" data-group="hunt">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 20</span><button class="hint-btn" data-hint-for="hq1">💡 Hint</button></div>
+          <p class="qprompt">Which stall is at (5, 2)?</p>
+          <div class="hint-box" id="hint-hq1">Find x = 5 first, then move up to y = 2 — which emoji is there?</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="hq1" data-correct="false">🎡 Ferris wheel</button>
+            <button class="opt-btn" data-qid="hq1" data-correct="false">🍿 Popcorn</button>
+            <button class="opt-btn" data-qid="hq1" data-correct="true">🎯 Dart board</button>
+            <button class="opt-btn" data-qid="hq1" data-correct="false">🍭 Candy floss</button>
+          </div>
+          <div class="feedback" id="fb-hq1"></div>
+          <div class="scaffold-box" id="scaffold-hq1">(5, 2) is 5 right and 2 up — that's the 🎯 dart board.</div>
+        </div>
+        <div class="qblock" id="block-hq2" data-group="hunt">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 21</span><button class="hint-btn" data-hint-for="hq2">💡 Hint</button></div>
+          <p class="qprompt">Which stall is at (−4, 5)?</p>
+          <div class="hint-box" id="hint-hq2">Negative x means left of the origin.</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="hq2" data-correct="true">🍿 Popcorn</button>
+            <button class="opt-btn" data-qid="hq2" data-correct="false">🎪 Big top tent</button>
+            <button class="opt-btn" data-qid="hq2" data-correct="false">🍭 Candy floss</button>
+            <button class="opt-btn" data-qid="hq2" data-correct="false">🎯 Dart board</button>
+          </div>
+          <div class="feedback" id="fb-hq2"></div>
+          <div class="scaffold-box" id="scaffold-hq2">(−4, 5) is 4 left and 5 up — that's the 🍿 popcorn stall.</div>
+        </div>
+        <div class="qblock" id="block-hq3" data-group="hunt">
+          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 22</span><span class="think-badge">💭 Think</span><button class="hint-btn" data-hint-for="hq3">💡 Hint</button></div>
+          <p class="qprompt">Which stall is at (6, −3)?</p>
+          <div class="hint-box" id="hint-hq3">Positive x, negative y — which quadrant is that, and which stall sits there?</div>
+          <div class="mcq-options">
+            <button class="opt-btn" data-qid="hq3" data-correct="false">🍭 Candy floss</button>
+            <button class="opt-btn" data-qid="hq3" data-correct="true">🎪 Big top tent</button>
+            <button class="opt-btn" data-qid="hq3" data-correct="false">🍿 Popcorn</button>
+            <button class="opt-btn" data-qid="hq3" data-correct="false">🎡 Ferris wheel</button>
+          </div>
+          <div class="feedback" id="fb-hq3"></div>
+          <div class="scaffold-box" id="scaffold-hq3">(6, −3): positive x, negative y → Quadrant IV — that's the 🎪 big top tent.</div>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="slide-footer">
+      <button class="back-btn" onclick="showSlide('s7')">&larr; Back</button>
+      <span class="progress-note">Page 8 / 11</span>
+      <button class="next-btn" onclick="showSlide('s9')">Next &rarr;</button>
+    </div>
+  
+  </section>
+<!-- SLIDE 9 — (B) PLOT & DRAW concept -->
+  <section class="slide light dense" id="s9">
+    <div class="slide-scroll">
     <div class="content-wrap">
       <div class="eyebrow">Section B — Plotting Points and Drawing a Line</div>
       <h2>Plot each point, then connect the dots</h2>
-      <p class="lede">To turn a set of ordered pairs into a graph: plot every point the same way you did in Section A — over to its x-value, then up or down to its y-value. If the points come from a <strong>linear</strong> relation, joining them with a ruler always gives a perfectly <strong>straight line</strong>.</p>
+      <p class="lede">To turn a set of ordered pairs into a graph: plot every point the same way you did in Section A — over to its x-value, then up or down to its y-value. If the points come from a <span class="key-term">linear</span> relation, joining them with a ruler always gives a perfectly <span class="key-term">straight line</span>.</p>
 
       <div class="tool-card">
         <div class="tool-label">Worked example</div>
         <div class="tool-row">
           <div class="tool-slider-block">
             <p style="font-size:0.9rem; line-height:1.6;">Points (−3, −1), (0, 2), (2, 4) all come from the same relation. Plot each one, then join them in order — they line up perfectly.</p>
-            <div class="note-callout" style="margin-top:0.8rem;">If your three points don't line up, check your plotting before assuming the relation isn't linear.</div>
+            <div class="callout-box" style="margin-top:0.8rem;">
+              <span class="callout-label">⚠️ Watch out</span>
+              If your three points <span class="key-term">don't line up</span>, check your plotting before assuming the relation isn't linear — a single misplaced point is almost always the cause.
+            </div>
           </div>
           <div class="tool-svg-block">
             <svg viewBox="0 0 350 350">
@@ -788,9 +1182,17 @@ Coordinates: (4, −3)</div>
       </div>
       <div class="note-callout">Try it yourself on the next page — click directly on the grid to plot each point.</div>
     </div>
+    </div>
+    <div class="slide-footer">
+      <button class="back-btn" onclick="showSlide('s8')">&larr; Back</button>
+      <span class="progress-note">Page 9 / 11</span>
+      <button class="next-btn" onclick="showSlide('s10')">Next &rarr;</button>
+    </div>
+  
   </section>
 <!-- SLIDE 8 — (B) practice: plot & connect activities -->
-  <section class="slide light dense" id="s8">
+  <section class="slide light dense" id="s10">
+    <div class="slide-scroll">
     <div class="content-wrap">
       <div class="eyebrow">Section B — Practice 🖱️</div>
       <h2>Plot the points, then connect them</h2>
@@ -807,7 +1209,7 @@ Coordinates: (4, −3)</div>
         </div>
         <div class="plot-followup qgrid">
           <div class="qblock" id="block-b1q" data-group="plotb">
-            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 8</span><button class="hint-btn" data-hint-for="b1q">💡 Hint</button></div>
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 23</span><button class="hint-btn" data-hint-for="b1q">💡 Hint</button></div>
             <p class="qprompt">Once connected, what shape do these three points form?</p>
             <div class="hint-box" id="hint-b1q">If every point comes from the same linear equation, what shape would you expect when you join them up?</div>
             <div class="mcq-options">
@@ -833,7 +1235,7 @@ Coordinates: (4, −3)</div>
         </div>
         <div class="plot-followup qgrid">
           <div class="qblock" id="block-b2q" data-group="plotb">
-            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 9</span><button class="hint-btn" data-hint-for="b2q">💡 Hint</button></div>
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 24</span><button class="hint-btn" data-hint-for="b2q">💡 Hint</button></div>
             <p class="qprompt">Looking at your line, does it slope upward or downward as you move left to right?</p>
             <div class="hint-box" id="hint-b2q">As x increases from −2 to 3, does y increase or decrease?</div>
             <div class="mcq-options">
@@ -845,7 +1247,7 @@ Coordinates: (4, −3)</div>
           </div>
 
           <div class="qblock" id="block-b3q" data-group="plotb">
-            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 10</span><span class="think-badge">💭 Think</span><button class="hint-btn" data-hint-for="b3q">💡 Hint</button></div>
+            <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 25</span><span class="think-badge">💭 Think</span><button class="hint-btn" data-hint-for="b3q">💡 Hint</button></div>
             <p class="qprompt">If you accidentally plotted one point in the wrong quadrant, what would happen when you tried to draw the straight line through all your points?</p>
             <div class="hint-box" id="hint-b3q">If every other point comes from the same equation and lines up perfectly, what happens when one point doesn't belong there?</div>
             <div class="mcq-options">
@@ -861,558 +1263,26 @@ Coordinates: (4, −3)</div>
       </div>
 
     </div>
-  </section>
-<!-- SLIDE 9 — (C) FUNCTIONS concept -->
-  <section class="slide dark dense" id="s9">
-    <div class="content-wrap">
-      <div class="eyebrow">Section C — Concept of a Function</div>
-      <h2>One input, exactly one output</h2>
-      <p class="lede">A <strong>function</strong> is a special relationship: every input value maps to <strong>exactly one</strong> output value. If an input could give two different outputs, it's not a function. Tap each example below.</p>
-      <div class="hook-grid stagger">
-        <div class="hook-card" onclick="this.classList.toggle('open')">
-          <span class="hc-icon">🪪</span>
-          <div class="hc-title">Index number → report card</div>
-          <div class="hc-body">Each student's index number belongs to exactly one report card. One input, one output.</div>
-          <div class="hc-tap">tap to check</div>
-          <div class="hc-verdict yes">✓ This is a function</div>
-        </div>
-        <div class="hook-card not-function-card" onclick="this.classList.toggle('open')">
-          <span class="hc-icon">👪</span>
-          <div class="hc-title">Surname → student</div>
-          <div class="hc-body">Many students can share the same surname, so one surname can point to several different students.</div>
-          <div class="hc-tap">tap to check</div>
-          <div class="hc-verdict no">✗ Not a function</div>
-        </div>
-        <div class="hook-card" onclick="this.classList.toggle('open')">
-          <span class="hc-icon">🌡️</span>
-          <div class="hc-title">Exact time → temperature</div>
-          <div class="hc-body">At any single instant, the thermometer reads exactly one value — never two temperatures at once.</div>
-          <div class="hc-tap">tap to check</div>
-          <div class="hc-verdict yes">✓ This is a function</div>
-        </div>
-        <div class="hook-card not-function-card" onclick="this.classList.toggle('open')">
-          <span class="hc-icon">📝</span>
-          <div class="hc-title">Exam score → student</div>
-          <div class="hc-body">Several students could score the same mark, so one score can map to many different students.</div>
-          <div class="hc-tap">tap to check</div>
-          <div class="hc-verdict no">✗ Not a function</div>
-        </div>
-      </div>
-
-      <div class="worked-example-card">
-        <div class="tool-label">✏️ How f(x) works — two examples, same function</div>
-        <div class="flip-card-grid">
-          <div class="flip-card flip-card-worked" onclick="this.classList.toggle('flipped')">
-            <div class="flip-card-inner">
-              <div class="flip-card-front">
-                <span class="flip-icon">🔄</span>
-                <p class="flip-question">① f(x) = 2x + 3<br>Find f(4).</p>
-                <span class="flip-tap-hint">tap to reveal</span>
-              </div>
-              <div class="flip-card-back">
-                <div class="flip-worked-steps">f(4) = 2(4) + 3
-f(4) = 8 + 3
-f(4) = 11</div>
-                <span class="flip-tap-hint">tap to hide</span>
-              </div>
-            </div>
-          </div>
-          <div class="flip-card flip-card-worked" onclick="this.classList.toggle('flipped')">
-            <div class="flip-card-inner">
-              <div class="flip-card-front">
-                <span class="flip-icon">🔄</span>
-                <p class="flip-question">② f(x) = 2x + 3<br>Find f(−1).</p>
-                <span class="flip-tap-hint">tap to reveal</span>
-              </div>
-              <div class="flip-card-back">
-                <div class="flip-worked-steps">f(−1) = 2(−1) + 3
-f(−1) = −2 + 3
-f(−1) = 1</div>
-                <span class="flip-tap-hint">tap to hide</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="note-callout" style="margin-top:1.1rem;">Notice: x = 4 always gives f(4) = 11 — never anything else. Every time you put in one specific x-value, you get exactly one y-value out. That's what makes it a <strong>function</strong>, and it's true for every linear function.</div>
-      </div>
-
-      <div class="note-callout">Vertical line test: if a vertical line ever crosses a graph more than once, y is not a function of x.</div>
     </div>
-  </section>
-<!-- SLIDE 10 — (C) practice -->
-  <section class="slide dark dense" id="s10">
-    <div class="content-wrap">
-      <div class="eyebrow">Section C — Practice</div>
-      <h2>Is it a function?</h2>
-      <div class="qgrid">
-
-        <div class="qblock" id="block-qf1" data-group="func">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 11</span><button class="hint-btn" data-hint-for="qf1">💡 Hint</button></div>
-          <p class="qprompt">Each student's index number maps to exactly one report card. Is this a function?</p>
-          <div class="hint-box" id="hint-qf1">Does any index number ever point to two different report cards?</div>
-          <div class="mcq-options">
-            <button class="opt-btn" data-qid="qf1" data-correct="true">Yes</button>
-            <button class="opt-btn" data-qid="qf1" data-correct="false">No</button>
-          </div>
-          <div class="feedback" id="fb-qf1"></div>
-          <div class="scaffold-box" id="scaffold-qf1">Each index number belongs to exactly one report card — one input, one output. Yes, it's a function.</div>
-        </div>
-
-        <div class="qblock" id="block-qf2" data-group="func">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 12</span><button class="hint-btn" data-hint-for="qf2">💡 Hint</button></div>
-          <p class="qprompt">A mapping takes each surname to every student who shares that surname. Is this a function (surname → student)?</p>
-          <div class="hint-box" id="hint-qf2">Can two different students share the same surname?</div>
-          <div class="mcq-options">
-            <button class="opt-btn" data-qid="qf2" data-correct="false">Yes</button>
-            <button class="opt-btn" data-qid="qf2" data-correct="true">No</button>
-          </div>
-          <div class="feedback" id="fb-qf2"></div>
-          <div class="scaffold-box" id="scaffold-qf2">One surname can map to several different students, so it's not a function.</div>
-        </div>
-
-        <div class="qblock" id="block-qf3" data-group="func">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 13</span><button class="hint-btn" data-hint-for="qf3">💡 Hint</button></div>
-          <p class="qprompt">For a relation to be a function, each input must map to ___.</p>
-          <div class="hint-box" id="hint-qf3">How many outputs is a function allowed to have, for each single input?</div>
-          <div class="mcq-options">
-            <button class="opt-btn" data-qid="qf3" data-correct="true">exactly one output</button>
-            <button class="opt-btn" data-qid="qf3" data-correct="false">at least one output</button>
-            <button class="opt-btn" data-qid="qf3" data-correct="false">two outputs</button>
-            <button class="opt-btn" data-qid="qf3" data-correct="false">no outputs</button>
-          </div>
-          <div class="feedback" id="fb-qf3"></div>
-          <div class="scaffold-box" id="scaffold-qf3">The defining rule of a function: exactly one output for every input.</div>
-        </div>
-
-        <div class="qblock" id="block-qf4" data-group="func">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 14</span><button class="hint-btn" data-hint-for="qf4">💡 Hint</button></div>
-          <p class="qprompt">A graph contains the vertical line x = 3. Does this represent y as a function of x?</p>
-          <div class="hint-box" id="hint-qf4">At x = 3, how many different y-values does that line pass through?</div>
-          <div class="mcq-options">
-            <button class="opt-btn" data-qid="qf4" data-correct="false">Yes</button>
-            <button class="opt-btn" data-qid="qf4" data-correct="true">No</button>
-          </div>
-          <div class="feedback" id="fb-qf4"></div>
-          <div class="scaffold-box" id="scaffold-qf4">At x = 3, every y-value on that line is included — infinitely many outputs for one input. Not a function.</div>
-        </div>
-
-        <div class="qblock" id="block-qf5" data-group="func">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 15</span><button class="hint-btn" data-hint-for="qf5">💡 Hint</button></div>
-          <p class="qprompt">The rule y = x² + 1 assigns each x exactly one y. Is y a function of x?</p>
-          <div class="hint-box" id="hint-qf5">For any x you pick, how many results does squaring and adding 1 give?</div>
-          <div class="mcq-options">
-            <button class="opt-btn" data-qid="qf5" data-correct="true">Yes</button>
-            <button class="opt-btn" data-qid="qf5" data-correct="false">No</button>
-          </div>
-          <div class="feedback" id="fb-qf5"></div>
-          <div class="scaffold-box" id="scaffold-qf5">Squaring a number and adding 1 always gives exactly one result. Yes, it's a function.</div>
-        </div>
-
-        <div class="qblock" id="block-qf6" data-group="func">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 16</span><button class="hint-btn" data-hint-for="qf6">💡 Hint</button></div>
-          <p class="qprompt">If f(x) = 2x + 3, find f(4).</p>
-          <div class="hint-box" id="hint-qf6">What do you get when you substitute x = 4 into f(x) = 2x + 3?</div>
-          <div class="numeric-row">
-            f(4) = <input type="text" inputmode="decimal" id="qf6-ans" placeholder="answer">
-            <button class="check-btn" data-check="numeric" data-qid="qf6" data-ans="11" data-group="func">Check</button>
-          </div>
-          <div class="feedback" id="fb-qf6"></div>
-          <div class="scaffold-box" id="scaffold-qf6">f(4) = 2(4) + 3
-f(4) = 8 + 3
-f(4) = 11</div>
-        </div>
-
-        <div class="qblock" id="block-qf7" data-group="func">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 17</span><button class="hint-btn" data-hint-for="qf7">💡 Hint</button></div>
-          <p class="qprompt">Now compare: is y = 9 a function of x, even though x doesn't appear anywhere in the equation?</p>
-          <div class="hint-box" id="hint-qf7">No matter what x you pick, how many y-values does this equation give?</div>
-          <div class="mcq-options">
-            <button class="opt-btn" data-qid="qf7" data-correct="true">Yes</button>
-            <button class="opt-btn" data-qid="qf7" data-correct="false">No</button>
-          </div>
-          <div class="feedback" id="fb-qf7"></div>
-          <div class="scaffold-box" id="scaffold-qf7">Every x-value still gives exactly one y-value — always 9. That's still a function, just a constant one. Compare this to x = 6 (or any vertical line): that's NOT a function, because one single x-value would have to map to every possible y at once.</div>
-        </div>
-
-        <div class="qblock" id="block-qf8" data-group="func">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 18</span><span class="think-badge">💭 Think</span><button class="hint-btn" data-hint-for="qf8">💡 Hint</button></div>
-          <p class="qprompt">A vending machine takes a code and gives out one specific snack. Is "code → snack" a function? What if two different codes could give the same snack — does that change your answer?</p>
-          <div class="hint-box" id="hint-qf8">The function rule only cares whether ONE input ever gives more than one output. Does two different inputs giving the SAME output break that rule?</div>
-          <div class="mcq-options">
-            <button class="opt-btn" data-qid="qf8" data-correct="true">Yes — many-to-one mappings are still functions</button>
-            <button class="opt-btn" data-qid="qf8" data-correct="false">No, two codes can't give the same snack</button>
-            <button class="opt-btn" data-qid="qf8" data-correct="false">No, vending machines can never be functions</button>
-            <button class="opt-btn" data-qid="qf8" data-correct="false">Only if every code gives a different snack</button>
-          </div>
-          <div class="feedback" id="fb-qf8"></div>
-          <div class="scaffold-box" id="scaffold-qf8">A function only breaks when one input maps to more than one output. Several different codes giving the same snack is perfectly fine — that's called "many-to-one", and it's still a valid function. It would only stop being a function if pressing the SAME code sometimes gave different snacks.</div>
-        </div>
-
-      </div>
+    <div class="slide-footer">
+      <button class="back-btn" onclick="showSlide('s9')">&larr; Back</button>
+      <span class="progress-note">Page 10 / 11</span>
+      <button class="next-btn" onclick="showSlide('s11')">Next &rarr;</button>
     </div>
+  
   </section>
-<!-- SLIDE 11 — (D) Equation of a Line: expanded concept -->
-  <section class="slide light dense" id="s11">
-    <div class="content-wrap">
-      <div class="eyebrow">Section D — Linear Functions and Linear Graphs</div>
-      <h2>The Equation of a Line</h2>
-      <p class="lede">Every straight-line graph can be written as an equation. Before we get into it, two quick definitions you'll need:</p>
-
-      <div class="intercept-defs">
-        <div class="intercept-def"><span class="id-term">x-intercept</span> — the x-coordinate of the point where a graph crosses the x-axis.</div>
-        <div class="intercept-def"><span class="id-term">y-intercept</span> — the y-coordinate of the point where a graph crosses the y-axis.</div>
-      </div>
-
-      <p class="lede" style="margin-top:1.2rem;">A linear function's equation always takes the same general form:</p>
-
-      <div class="flip-card flip-card-wide" onclick="this.classList.toggle('flipped')">
-        <div class="flip-card-inner">
-          <div class="flip-card-front">
-            <span class="flip-icon">🔄</span>
-            <p class="flip-question">What is the general equation of a Straight-Line (Linear) function?</p>
-            <span class="flip-tap-hint">tap to reveal</span>
-          </div>
-          <div class="flip-card-back">
-            <div class="eqn-general-formula" style="color:#fff; margin-bottom:0.7rem;">y = <span style="color:#FFD166;">m</span>x + <span style="color:#FF7AA2;">c</span></div>
-            <div class="eqn-general-rows" style="text-align:left;">
-              <div class="eqn-general-row"><span class="eqn-key" style="color:#FFD166;">m</span> is the <strong>gradient</strong> — how steep the line is, and which direction it slopes.</div>
-              <div class="eqn-general-row"><span class="eqn-key" style="color:#FF7AA2;">c</span> is the <strong>y-intercept</strong> — the point where the line crosses the y-axis, at (0, c).</div>
-            </div>
-            <span class="flip-tap-hint">tap to hide</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="flip-card flip-card-wide" onclick="this.classList.toggle('flipped')">
-        <div class="flip-card-inner">
-          <div class="flip-card-front">
-            <span class="flip-icon">🔄</span>
-            <p class="flip-question">What does it mean for a point to "satisfy" an equation?</p>
-            <span class="flip-tap-hint">tap to reveal</span>
-          </div>
-          <div class="flip-card-back">
-            <p style="font-size:0.86rem; line-height:1.6; text-align:left;">When you substitute x = a and y = b into y = mx + c, and <strong>both sides become equal</strong> (LHS = RHS), we say the pair of values <strong>satisfies</strong> the equation.</p>
-            <p style="font-size:0.86rem; line-height:1.6; text-align:left; margin-top:0.6rem;">That means the point (a, b) <strong>lies on the graph</strong> of y = mx + c.</p>
-            <span class="flip-tap-hint">tap to hide</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="worked-example-card">
-        <div class="tool-label">✏️ Worked example — y = 3x − 4</div>
-        <div class="tool-row">
-          <div class="tool-slider-block">
-            <p style="font-size:0.92rem; line-height:1.65;">Comparing y = 3x − 4 to y = mx + c directly:</p>
-            <div class="eqn-general-rows" style="margin-top:0.6rem;">
-              <div class="eqn-general-row"><span class="eqn-key" style="color:var(--coral);">m = 3</span> — the gradient</div>
-              <div class="eqn-general-row"><span class="eqn-key" style="color:var(--mint);">c = −4</span> — the y-intercept</div>
-            </div>
-            <p style="font-size:0.92rem; line-height:1.65; margin-top:0.9rem;">We can check the gradient by picking two points on the line and using rise over run:</p>
-            <div class="gradient-calc-display" style="margin-top:0.6rem;">
-              <span>m =</span>
-              <span class="stacked-frac"><span class="frac-num">6</span><span class="frac-den">2</span></span>
-              <span>= 3 ✓</span>
-            </div>
-            <p style="font-size:0.92rem; line-height:1.65; margin-top:0.9rem;">When you substitute a pair of values x = a and y = b into an equation, and both sides come out equal, we say that pair of values <strong>satisfies the equation</strong>. This tells us the point (a, b) lies exactly on the graph of that equation.</p>
-            <p style="font-size:0.92rem; line-height:1.65; margin-top:0.9rem;">Does the point (1, −1) satisfy y = 3x − 4? Substitute and check both sides:</p>
-            <div class="worked-steps" style="margin-top:0.5rem;">LHS: y = −1
-RHS: 3(1) − 4 = −1
-LHS = RHS ✓ — so (1, −1) lies on the line.</div>
-          </div>
-          <div class="tool-svg-block">
-            <svg viewBox="0 0 350 350" style="max-width:420px;">
-              <g id="d-example-grid"></g>
-              <line x1="160" y1="280" x2="235" y2="55" style="stroke:var(--mint)" stroke-width="2.6"/>
-              <line x1="190" y1="190" x2="220" y2="190" style="stroke:var(--coral)" stroke-dasharray="4,3" stroke-width="1.4"/>
-              <line x1="220" y1="190" x2="220" y2="100" style="stroke:var(--coral)" stroke-dasharray="4,3" stroke-width="1.4"/>
-              <circle cx="190" cy="190" r="4.5" style="fill:var(--gold)"/>
-              <circle cx="220" cy="100" r="4.5" style="fill:var(--gold)"/>
-              <circle cx="175" cy="235" r="5.5" style="fill:var(--coral)"/>
-              <text x="192" y="207" font-size="10" font-family="monospace" fill="currentColor">run = 2</text>
-              <text x="227" y="147" font-size="10" font-family="monospace" fill="currentColor">rise = 6</text>
-              <text x="118" y="252" font-size="10" font-family="monospace" fill="currentColor">y-intercept = −4</text>
-              <text x="195" y="48" font-size="13" font-family="'Space Grotesk', sans-serif" font-weight="700" fill="var(--mint)">y = 3x − 4</text>
-
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      <div class="worked-example-card">
-        <div class="tool-label">✏️ Rearranging into y = mx + c form</div>
-        <p style="font-size:0.92rem; line-height:1.65;">Sometimes an equation isn't written in y = mx + c form yet — you'll need to rearrange it first before you can read off m and c.</p>
-        <p style="font-size:0.92rem; line-height:1.65; margin-top:0.8rem;"><strong>Example:</strong> Rearrange 2y = 6x + 8.</p>
-        <div class="worked-steps" style="margin-top:0.5rem;">2y = 6x + 8
-Divide every term by 2:
-y = 3x + 4</div>
-        <p style="font-size:0.92rem; line-height:1.65; margin-top:0.8rem;">Now it's in y = mx + c form, so we can read it straight off: <strong>m = 3</strong>, <strong>c = 4</strong>.</p>
-      </div>
-
-      <div class="note-callout">Next page: use the interactive tool to drag m and c yourself and watch the line move live.</div>
-    </div>
-  </section>
-<!-- SLIDE 12 — (D) Try it — drag m and c -->
-  <section class="slide light dense" id="s12">
-    <div class="content-wrap">
-      <div class="eyebrow">Section D — Try it yourself</div>
-      <h2>Drag m and c and watch the line move</h2>
-      <p class="lede">Use the sliders below to change the gradient and y-intercept. Watch how the line, the equation, and the table of values all update together.</p>
-
-      <div class="tool-card">
-        <div class="tool-label">🎛️ Try it — drag m and c</div>
-        <div class="tool-row">
-          <div class="tool-slider-block">
-            <label>Gradient, m = <span id="lineMLbl">2</span></label>
-            <input type="range" id="lineM" min="-5" max="5" step="0.5" value="2" oninput="updateLineTool()">
-            <label style="margin-top:0.8rem;">y-intercept, c = <span id="lineCLbl">-1</span></label>
-            <input type="range" id="lineC" min="-6" max="6" step="1" value="-1" oninput="updateLineTool()">
-            <div class="tool-output" style="margin-top:1rem;">
-              <div class="line total"><span>Equation</span><span id="lineEqLbl">y = 2x − 1</span></div>
-            </div>
-            <table class="mini-table" style="margin-top:0.8rem;">
-              <tr><th>x</th><td>−2</td><td>0</td><td>2</td></tr>
-              <tr><th>y</th><td id="lineYm2">−5</td><td id="lineY0">−1</td><td id="lineY2">3</td></tr>
-            </table>
-          </div>
-          <div class="tool-svg-block">
-            <svg id="lineSvg" viewBox="0 0 350 350">
-              <defs><clipPath id="lineClip"><rect x="25" y="25" width="300" height="300"/></clipPath></defs>
-              <g id="line-grid"></g><g id="line-dyn"></g>
-            </svg>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-<!-- SLIDE 13 — (D) practice: evaluate & read equations -->
-  <section class="slide light dense" id="s13">
-    <div class="content-wrap">
-      <div class="eyebrow">Section D — Practice: Linear Equations</div>
-      <h2>Linear equations &amp; tables of values</h2>
-
-      <div class="worked-example-card">
-        <div class="tool-label">✏️ Two directions, one equation: y = 2x + 5</div>
-        <div class="flip-card-grid">
-          <div class="flip-card flip-card-worked" onclick="this.classList.toggle('flipped')">
-            <div class="flip-card-inner">
-              <div class="flip-card-front">
-                <span class="flip-icon">🔄</span>
-                <p class="flip-question">① Substitute x, solve for y<br>Find y when x = 3.</p>
-                <span class="flip-tap-hint">tap to reveal</span>
-              </div>
-              <div class="flip-card-back">
-                <div class="flip-worked-steps">y = 2(3) + 5
-y = 6 + 5
-y = 11</div>
-                <span class="flip-tap-hint">tap to hide</span>
-              </div>
-            </div>
-          </div>
-          <div class="flip-card flip-card-worked" onclick="this.classList.toggle('flipped')">
-            <div class="flip-card-inner">
-              <div class="flip-card-front">
-                <span class="flip-icon">🔄</span>
-                <p class="flip-question">② Substitute y, solve for x<br>Find x when y = 11.</p>
-                <span class="flip-tap-hint">tap to reveal</span>
-              </div>
-              <div class="flip-card-back">
-                <div class="flip-worked-steps">11 = 2x + 5
-11 − 5 = 2x
-6 = 2x
-x = 3</div>
-                <span class="flip-tap-hint">tap to hide</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="note-callout" style="margin-top:1.1rem;">Notice: these two examples are opposites of each other. x = 3 gives y = 11 — and y = 11 gives x = 3. Same equation, same line, just working in different directions.</div>
-      </div>
-
-      <div class="qgrid" style="margin-top:1.6rem;">
-
-        <div class="qblock" id="block-ql1" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 19</span><button class="hint-btn" data-hint-for="ql1">💡 Hint</button></div>
-          <p class="qprompt">For y = 3x − 2, find y when x = 4.</p>
-          <div class="hint-box" id="hint-ql1">What do you get when you substitute x = 4 into y = 3x − 2?</div>
-          <div class="numeric-row">
-            y = <input type="text" inputmode="decimal" id="ql1-ans" placeholder="answer">
-            <button class="check-btn" data-check="numeric" data-qid="ql1" data-ans="10" data-group="linear">Check</button>
-          </div>
-          <div class="feedback" id="fb-ql1"></div>
-          <div class="scaffold-box" id="scaffold-ql1">y = 3(4) − 2
-y = 12 − 2
-y = 10</div>
-        </div>
-
-        <div class="qblock" id="block-ql2" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 20</span><button class="hint-btn" data-hint-for="ql2">💡 Hint</button></div>
-          <p class="qprompt">For y = −2x + 5, find y when x = −3.</p>
-          <div class="hint-box" id="hint-ql2">There are two negative signs in this substitution — what happens when a negative multiplies a negative?</div>
-          <div class="numeric-row">
-            y = <input type="text" inputmode="decimal" id="ql2-ans" placeholder="answer">
-            <button class="check-btn" data-check="numeric" data-qid="ql2" data-ans="11" data-group="linear">Check</button>
-          </div>
-          <div class="feedback" id="fb-ql2"></div>
-          <div class="scaffold-box" id="scaffold-ql2">y = −2(−3) + 5
-y = 6 + 5
-y = 11</div>
-        </div>
-
-        <div class="qblock" id="block-ql3" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 21</span><button class="hint-btn" data-hint-for="ql3">💡 Hint</button></div>
-          <p class="qprompt">For y = <span class="stacked-frac"><span class="frac-num">1</span><span class="frac-den">2</span></span>x + 4, find y when x = 6.</p>
-          <div class="hint-box" id="hint-ql3">What is half of 6?</div>
-          <div class="numeric-row">
-            y = <input type="text" inputmode="decimal" id="ql3-ans" placeholder="answer">
-            <button class="check-btn" data-check="numeric" data-qid="ql3" data-ans="7" data-group="linear">Check</button>
-          </div>
-          <div class="feedback" id="fb-ql3"></div>
-          <div class="scaffold-box" id="scaffold-ql3">y = <span class="stacked-frac"><span class="frac-num">1</span><span class="frac-den">2</span></span>(6) + 4
-y = 3 + 4
-y = 7</div>
-        </div>
-
-        <div class="qblock" id="block-ql4" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 22</span><button class="hint-btn" data-hint-for="ql4">💡 Hint</button></div>
-          <p class="qprompt">The equation y = mx + 5 passes through (0, 5) no matter what m is. What is its y-intercept, c?</p>
-          <div class="hint-box" id="hint-ql4">In y = mx + c, which part of the equation never changes, no matter what x is?</div>
-          <div class="numeric-row">
-            c = <input type="text" inputmode="decimal" id="ql4-ans" placeholder="answer">
-            <button class="check-btn" data-check="numeric" data-qid="ql4" data-ans="5" data-group="linear">Check</button>
-          </div>
-          <div class="feedback" id="fb-ql4"></div>
-          <div class="scaffold-box" id="scaffold-ql4">In y = mx + c, the constant term is c. Here c = 5.</div>
-        </div>
-
-        <div class="qblock" id="block-ql5" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 23</span><button class="hint-btn" data-hint-for="ql5">💡 Hint</button></div>
-          <p class="qprompt">Which of these is a linear equation in x and y?</p>
-          <div class="hint-box" id="hint-ql5">For an equation to be considered linear, it must fit the general form y = mx + c. Does this equation match that form?</div>
-          <div class="mcq-options">
-            <button class="opt-btn" data-qid="ql5" data-correct="false">y = x² + 1</button>
-            <button class="opt-btn" data-qid="ql5" data-correct="true">y = 3x − 7</button>
-            <button class="opt-btn" data-qid="ql5" data-correct="false">y = 1/x</button>
-            <button class="opt-btn" data-qid="ql5" data-correct="false">xy = 6</button>
-          </div>
-          <div class="feedback" id="fb-ql5"></div>
-          <div class="scaffold-box" id="scaffold-ql5">y = 3x − 7 has the form y = mx + c — a straight line. The others involve x², 1/x or xy, so they aren't linear.</div>
-        </div>
-
-        <div class="qblock" id="block-ql6" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 24</span><button class="hint-btn" data-hint-for="ql6">💡 Hint</button></div>
-          <p class="qprompt">For y = 5x − 3, identify the gradient, m.</p>
-          <div class="hint-box" id="hint-ql6">In y = mx + c, which letter represents the gradient — and what number is in that position here?</div>
-          <div class="numeric-row">
-            m = <input type="text" inputmode="decimal" id="ql6-ans" placeholder="answer">
-            <button class="check-btn" data-check="numeric" data-qid="ql6" data-ans="5" data-group="linear">Check</button>
-          </div>
-          <div class="feedback" id="fb-ql6"></div>
-          <div class="scaffold-box" id="scaffold-ql6">Comparing y = 5x − 3 with y = mx + c:
-m = 5</div>
-        </div>
-
-        <div class="qblock" id="block-ql7" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 25</span><button class="hint-btn" data-hint-for="ql7">💡 Hint</button></div>
-          <p class="qprompt">Using the same equation, y = 5x − 3, identify the y-intercept, c.</p>
-          <div class="hint-box" id="hint-ql7">In y = mx + c, which letter represents the y-intercept — and what number is in that position here?</div>
-          <div class="numeric-row">
-            c = <input type="text" inputmode="decimal" id="ql7-ans" placeholder="answer">
-            <button class="check-btn" data-check="numeric" data-qid="ql7" data-ans="-3" data-group="linear">Check</button>
-          </div>
-          <div class="feedback" id="fb-ql7"></div>
-          <div class="scaffold-box" id="scaffold-ql7">Comparing y = 5x − 3 with y = mx + c:
-c = −3</div>
-        </div>
-
-        <div class="qblock" id="block-ql8" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 26</span><button class="hint-btn" data-hint-for="ql8">💡 Hint</button></div>
-          <p class="qprompt">For y = 4x − 3, find x when y = 13.</p>
-          <div class="hint-box" id="hint-ql8">Substitute y = 13 into the equation — what do you get left to solve for x?</div>
-          <div class="numeric-row">
-            x = <input type="text" inputmode="decimal" id="ql8-ans" placeholder="answer">
-            <button class="check-btn" data-check="numeric" data-qid="ql8" data-ans="4" data-group="linear">Check</button>
-          </div>
-          <div class="feedback" id="fb-ql8"></div>
-          <div class="scaffold-box" id="scaffold-ql8">13 = 4x − 3
-13 + 3 = 4x
-16 = 4x
-x = 4</div>
-        </div>
-
-        <div class="qblock" id="block-ql9" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 27</span><button class="hint-btn" data-hint-for="ql9">💡 Hint</button></div>
-          <p class="qprompt">Rearrange 2y = 6x + 8 into the form y = mx + c. What is the gradient, m?</p>
-          <div class="hint-box" id="hint-ql9">Every term is currently multiplied by 2. What do you need to do to both sides to get y on its own?</div>
-          <div class="numeric-row">
-            m = <input type="text" inputmode="decimal" id="ql9-ans" placeholder="answer">
-            <button class="check-btn" data-check="numeric" data-qid="ql9" data-ans="3" data-group="linear">Check</button>
-          </div>
-          <div class="feedback" id="fb-ql9"></div>
-          <div class="scaffold-box" id="scaffold-ql9">2y = 6x + 8
-Divide every term by 2:
-y = 3x + 4
-m = 3</div>
-        </div>
-
-        <div class="qblock" id="block-ql10" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 28</span><button class="hint-btn" data-hint-for="ql10">💡 Hint</button></div>
-          <p class="qprompt">Rearrange 4y = 8x − 12 into the form y = mx + c. What is the y-intercept, c?</p>
-          <div class="hint-box" id="hint-ql10">Every term is currently multiplied by 4. What do you need to do to both sides to get y on its own?</div>
-          <div class="numeric-row">
-            c = <input type="text" inputmode="decimal" id="ql10-ans" placeholder="answer">
-            <button class="check-btn" data-check="numeric" data-qid="ql10" data-ans="-3" data-group="linear">Check</button>
-          </div>
-          <div class="feedback" id="fb-ql10"></div>
-          <div class="scaffold-box" id="scaffold-ql10">4y = 8x − 12
-Divide every term by 4:
-y = 2x − 3
-c = −3</div>
-        </div>
-
-        <div class="qblock" id="block-ql11" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 29</span><button class="hint-btn" data-hint-for="ql11">💡 Hint</button></div>
-          <p class="qprompt">Rearrange 3y − 6x = 12 into the form y = mx + c. What is the gradient, m?</p>
-          <div class="hint-box" id="hint-ql11">First move the −6x to the other side of the equation. Then deal with the 3 in front of y.</div>
-          <div class="numeric-row">
-            m = <input type="text" inputmode="decimal" id="ql11-ans" placeholder="answer">
-            <button class="check-btn" data-check="numeric" data-qid="ql11" data-ans="2" data-group="linear">Check</button>
-          </div>
-          <div class="feedback" id="fb-ql11"></div>
-          <div class="scaffold-box" id="scaffold-ql11">3y − 6x = 12
-3y = 6x + 12
-Divide every term by 3:
-y = 2x + 4
-m = 2</div>
-        </div>
-
-        <div class="qblock" id="block-ql12" data-group="linear">
-          <div class="qhead"><span class="qtag"><span class="solved-icon">✓</span>Practice 30</span><span class="think-badge">💭 Think</span><button class="hint-btn" data-hint-for="ql12">💡 Hint</button></div>
-          <p class="qprompt">Two students rearrange 4y = 8x + 12 differently, but both end up claiming y = 2x + 3 is correct. How could you check who's right without redoing all the algebra from scratch?</p>
-          <div class="hint-box" id="hint-ql12">If two equations are truly equivalent, what should happen when you substitute the same x-value into both of them?</div>
-          <div class="mcq-options">
-            <button class="opt-btn" data-qid="ql12" data-correct="true">Substitute a test x-value into both equations</button>
-            <button class="opt-btn" data-qid="ql12" data-correct="false">Just trust whoever wrote their working out neater</button>
-            <button class="opt-btn" data-qid="ql12" data-correct="false">Rearranging always gives the same answer, so there's nothing to check</button>
-            <button class="opt-btn" data-qid="ql12" data-correct="false">Compare how many steps each student used</button>
-          </div>
-          <div class="feedback" id="fb-ql12"></div>
-          <div class="scaffold-box" id="scaffold-ql12">Try x = 1 in both. Original: 4y = 8(1) + 12 = 20, so y = 5. Rearranged: y = 2(1) + 3 = 5. Both give y = 5 — they agree, which confirms the rearrangement satisfies the original equation.</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-<!-- SLIDE 14 — SUMMARY + SCREENSHOT REMINDER -->
-  <section class="slide dark dense" id="s14">
+<!-- SLIDE 11 — SUMMARY (1A) -->
+  <section class="slide dark dense" id="s11">
+    <div class="slide-scroll">
     <div class="content-wrap">
       <div class="screenshot-banner">
         <span class="ss-icon">📸</span>
         <h3>Take a screenshot of this page now!</h3>
-        <p>This is your record of Part 1 — your score and everything you've learned so far. Your progress is saved on this device, but a screenshot means you'll always have proof of it.</p>
+        <p>This is your record of Part 1A — your score and everything you've learned so far. Your progress is saved on this device, but a screenshot means you'll always have proof of it.</p>
       </div>
 
-      <div class="eyebrow">Part 1 of 3 complete</div>
-      <div class="score-banner">Your score: <strong id="finalScore">0 / 32</strong></div>
+      <div class="eyebrow">Part 1A of 4 complete</div>
+      <div class="score-banner">Your score: <strong id="finalScore">0 / 28</strong></div>
       <h2 style="margin-top:1.2rem;">Everything you've covered so far</h2>
 
       <div class="summary-grid stagger">
@@ -1422,6 +1292,15 @@ m = 2</div>
             <p>The <strong>origin</strong> (0, 0) is where the x-axis and y-axis cross.</p>
             <p>An <strong>ordered pair</strong> (x, y) gives a point's exact position — x is how far left/right from the origin, y is how far up/down from the origin.</p>
             <p>The two axes split the plane into <strong>4 quadrants</strong>: I (+,+), II (−,+), III (−,−), IV (+,−).</p>
+            <p>A point with x = 0 sits exactly on the y-axis; a point with y = 0 sits exactly on the x-axis.</p>
+          </div>
+        </div>
+        <div class="summary-card">
+          <div class="sc-title">A · Plotting &amp; reading individual points</div>
+          <div class="sc-body">
+            <p>To plot any single point: count left/right from the origin for x, then up/down for y.</p>
+            <p>Reading coordinates off a diagram works in reverse — count how far the point has moved from the origin in each direction.</p>
+            <p>The Coordinate Hunt activity practised this both ways: writing an ordered pair for a given item, and naming the item at a given ordered pair.</p>
           </div>
         </div>
         <div class="summary-card">
@@ -1431,52 +1310,41 @@ m = 2</div>
             <p>Plot each point in a set, then connect them — if they come from a linear relation, they'll always line up into a perfectly straight line.</p>
           </div>
         </div>
-        <div class="summary-card">
-          <div class="sc-title">C · Functions</div>
-          <div class="sc-body">
-            <p>A <strong>function</strong> means every input maps to exactly one output.</p>
-            <p>For f(x) = 2x + 3, putting in x = 4 always gives f(4) = 11 — never anything else.</p>
-            <p>A vertical line on a graph is NOT a function, since one x-value would give infinitely many y-values.</p>
-          </div>
-        </div>
-        <div class="summary-card">
-          <div class="sc-title">D · y = mx + c</div>
-          <div class="sc-body">
-            <p>Every linear equation graphs as a straight line.</p>
-            <p><strong>m</strong> is the gradient (steepness/direction), <strong>c</strong> is the y-intercept (where it crosses the y-axis, at (0, c)).</p>
-            <p>You can substitute an x-value to find y, or substitute a y-value to find x — same equation, both directions.</p>
-            <p>If a pair of values makes both sides of the equation equal, they <strong>satisfy the equation</strong> — that point lies on the line.</p>
-            <p>If an equation isn't already in y = mx + c form, rearrange it first before reading off m and c.</p>
-          </div>
-        </div>
       </div>
 
-      <div class="next-teaser" style="margin-top:1.6rem;">⏭️ Next session (Part 2 of 3): completing a full table of values and drawing the graph, then gradient and real-world applications.</div>
+      <div class="next-teaser" style="margin-top:1.6rem;">⏭️ Next up (Part 1B of 4): recognising functions, turning word statements into equations, then the full equation of a line, y = mx + c.</div>
     </div>
+    </div>
+    <div class="slide-footer">
+      <button class="back-btn" onclick="showSlide('s10')">&larr; Back</button>
+      <span class="progress-note">Page 11 / 11</span>
+      <button class="next-btn" disabled>End of Part 1A &#10003;</button>
+    </div>
+  
   </section>
-
 
 </div>
 
 <script>
-  const slideIds = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11','s12','s13','s14'];
-  const darkSlides = new Set(['s1','s3','s5','s6','s9','s10','s14']);
+  const slideIds = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11'];
+  const darkSlides = new Set(['s1','s3','s5','s6','s7','s8','s11']);
   const chipGroups = [
     {group:'cart', label:'A. Coordinates', target:'s5', total:7},
-    {group:'plotb', label:'B. Plot &amp; Draw', target:'s7', total:5},
-    {group:'func', label:'C. Functions', target:'s9', total:8},
-    {group:'linear', label:'D. Linear Eqns', target:'s13', total:12}
+    {group:'coordx', label:'A. Plot &amp; Read', target:'s7', total:8},
+    {group:'hunt', label:'A. Coord Hunt', target:'s8', total:8},
+    {group:'plotb', label:'B. Plot &amp; Draw', target:'s9', total:5}
   ];
   const state = { answered:{}, score:0, groupCount:{} };
   chipGroups.forEach(g => state.groupCount[g.group] = 0);
   const totalQuestions = chipGroups.reduce((a,g)=>a+g.total,0);
 
   // ---------- Progress persistence ----------
-  const STORAGE_KEY = 'linearFunctionsDeck_part1of3_v1';
+  const STORAGE_KEY = 'linearFunctionsDeck_part1Aof4_v1';
   function saveProgress(){
     try{
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        answered: state.answered, score: state.score, groupCount: state.groupCount
+        answered: state.answered, score: state.score, groupCount: state.groupCount,
+        currentSlideIdx: currentSlideIdx
       }));
     }catch(e){ /* storage unavailable — progress just won't persist */ }
   }
@@ -1492,8 +1360,10 @@ m = 2</div>
     state.score = savedProgress.score || 0;
     state.groupCount = Object.assign({}, state.groupCount, savedProgress.groupCount || {});
   }
+  const resumeSlideIdx = (savedProgress && typeof savedProgress.currentSlideIdx === 'number')
+    ? Math.min(savedProgress.currentSlideIdx, slideIds.length-1) : 0;
 
-  // ---------- Top bar ----------
+  // ---------- Top bar + gated slide navigation ----------
   const deck = document.getElementById('deck');
   const tbChips = document.getElementById('tbChips');
   chipGroups.forEach(g => {
@@ -1501,38 +1371,40 @@ m = 2</div>
     el.className = 'progress-item';
     el.id = 'chip-' + g.group;
     el.innerHTML = '<span class="dot"></span><span>' + g.label + '</span>';
-    el.onclick = () => document.getElementById(g.target).scrollIntoView({behavior:'smooth'});
+    el.onclick = () => showSlide(g.target);
     tbChips.appendChild(el);
   });
   document.getElementById('slideTotal').textContent = slideIds.length;
   document.getElementById('tbScore').textContent = 'Score 0/' + totalQuestions;
 
-  function currentSlideIndex(){
-    let idx = 0, best = Infinity;
-    slideIds.forEach((id,i) => {
-      const r = document.getElementById(id).getBoundingClientRect();
-      const d = Math.abs(r.top);
-      if(d < best){ best = d; idx = i; }
-    });
-    return idx;
-  }
+  let currentSlideIdx = 0;
+
+  function currentSlideIndex(){ return currentSlideIdx; }
+
   function updateTopBarChrome(){
-    const idx = currentSlideIndex();
+    const idx = currentSlideIdx;
     document.getElementById('slideNum').textContent = idx+1;
     document.getElementById('counterFill').style.width = ((idx+1)/slideIds.length*100) + '%';
     document.body.classList.toggle('on-dark', darkSlides.has(slideIds[idx]));
   }
-  deck.addEventListener('scroll', () => window.requestAnimationFrame(updateTopBarChrome));
-  updateTopBarChrome();
 
-  document.getElementById('prevBtn').onclick = () => {
-    const idx = Math.max(0, currentSlideIndex()-1);
-    document.getElementById(slideIds[idx]).scrollIntoView({behavior:'smooth'});
-  };
-  document.getElementById('nextBtn').onclick = () => {
-    const idx = Math.min(slideIds.length-1, currentSlideIndex()+1);
-    document.getElementById(slideIds[idx]).scrollIntoView({behavior:'smooth'});
-  };
+  function showSlide(idOrIdx){
+    const targetIdx = (typeof idOrIdx === 'number') ? idOrIdx : slideIds.indexOf(idOrIdx);
+    if(targetIdx < 0 || targetIdx >= slideIds.length) return;
+    document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+    const targetEl = document.getElementById(slideIds[targetIdx]);
+    targetEl.classList.add('active');
+    const scroller = targetEl.querySelector('.slide-scroll');
+    if(scroller) scroller.scrollTop = 0;
+    currentSlideIdx = targetIdx;
+    updateTopBarChrome();
+    saveProgress();
+  }
+
+  showSlide(resumeSlideIdx);
+
+  document.getElementById('prevBtn').onclick = () => { showSlide(Math.max(0, currentSlideIdx-1)); };
+  document.getElementById('nextBtn').onclick = () => { showSlide(Math.min(slideIds.length-1, currentSlideIdx+1)); };
 
   // ---------- hint buttons ----------
   document.querySelectorAll('.hint-btn').forEach(btn => {
@@ -1670,7 +1542,7 @@ m = 2</div>
     html += `<text x="${toX(0)}" y="${toY(GRID_MAX)-8}" font-size="13" font-style="italic" text-anchor="middle" fill="currentColor" opacity="0.85" font-family="'Space Grotesk', sans-serif">y</text>`;
     groupEl.innerHTML = html;
   }
-  ['cart-grid','line-grid','grad-grid','example-grid','plot1-grid','plot2-grid','plot3-grid','plot4-grid','plot5-grid','plot6-grid','b1-triangle-grid','d-example-grid'].forEach(id => {
+  ['cart-grid','line-grid','grad-grid','example-grid','plot1-grid','plot2-grid','plot3-grid','plot4-grid','plot5-grid','plot6-grid','b1-triangle-grid','d-example-grid','plotIndiv-grid','readpts-grid','hunt-grid'].forEach(id => {
     const el = document.getElementById(id);
     if(el) buildGridStatic(el);
   });
@@ -1856,10 +1728,16 @@ m = 2</div>
         const [px,py] = key.split(',').map(Number);
         html += `<circle cx="${toX(px)}" cy="${toY(py)}" r="5.5" style="fill:var(--mint)"/>`;
       });
-      if(completed){
+      if(completed && !opts.noLine){
         const pts = opts.targets.slice().sort((a,b)=>a[0]-b[0]);
         const path = pts.map(p => toX(p[0])+','+toY(p[1])).join(' ');
         html = `<polyline points="${path}" fill="none" style="stroke:${opts.lineColor||'var(--mint)'}" stroke-width="2.4"/>` + html;
+      }
+      if(completed && opts.noLine && opts.labels){
+        opts.targets.forEach((t,i) => {
+          const lx = toX(t[0]) + (t[1] >= 0 ? 8 : 8), ly = toY(t[1]) - 9;
+          html += `<text x="${lx}" y="${ly}" font-size="13" font-weight="700" fill="var(--mint)">${opts.labels[i]}</text>`;
+        });
       }
       dyn.innerHTML = html;
       if(progressEl){
@@ -1912,6 +1790,12 @@ m = 2</div>
   setupPlotActivity({
     svgId:'plotSvg2', dynId:'plot2-dyn', progressId:'plot2-progress',
     targets:[[-2,6],[0,2],[3,-4]], group:'plotb', qidPrefix:'plot2', lineColor:'var(--coral)'
+  });
+  setupPlotActivity({
+    svgId:'plotSvgIndiv', dynId:'plotIndiv-dyn', progressId:'plotIndiv-progress',
+    targets:[[4,3],[-3,5],[-5,-2],[2,-4]], group:'coordx', qidPrefix:'plotIndiv',
+    noLine:true, labels:['A','B','C','D'],
+    completeMsg:'4 / 4 points plotted!'
   });
 
   // ---------- Section D: fill table + plot (3 exercises) ----------
@@ -1975,6 +1859,52 @@ m = 2</div>
       fb.textContent = 'Not quite — check against y = mx + c.';
       fb.className = 'feedback bad';
       document.getElementById('scaffold-gradintercept-ex4').classList.add('show');
+    }
+  }
+  // ---------- Read-the-coordinates dual input check (Section A extension) ----------
+  function checkPointCoord(id, ansX, ansY, group){
+    const xInput = document.getElementById(id+'-x-ans');
+    const yInput = document.getElementById(id+'-y-ans');
+    const xVal = parseFloat((xInput.value||'').replace(/[^0-9.\-]/g,''));
+    const yVal = parseFloat((yInput.value||'').replace(/[^0-9.\-]/g,''));
+    const ok = !isNaN(xVal) && !isNaN(yVal) && Math.abs(xVal-ansX) <= 0.02 && Math.abs(yVal-ansY) <= 0.02;
+    xInput.classList.toggle('cell-correct', ok); xInput.classList.toggle('cell-wrong', !ok);
+    yInput.classList.toggle('cell-correct', ok); yInput.classList.toggle('cell-wrong', !ok);
+    const fb = document.getElementById('fb-'+id);
+    if(ok){
+      xInput.disabled = true; yInput.disabled = true;
+      markSolved(id, group);
+      fb.textContent = '✓ Correct!'; fb.className = 'feedback good';
+    } else {
+      fb.textContent = 'Not quite — check the hint and try again.'; fb.className = 'feedback bad';
+      const hintBox = document.getElementById('hint-'+id);
+      if(hintBox) hintBox.classList.add('show');
+    }
+  }
+  // ---------- Statement-to-table check (Section C extension) ----------
+  let stmtTableAttempts = 0;
+  const stmtTableAns = {se1:-3, se2:1, se3:5};
+  function checkStmtTable(){
+    let allCorrect = true;
+    Object.keys(stmtTableAns).forEach(id => {
+      const input = document.getElementById(id+'-ans');
+      const val = parseFloat((input.value||'').replace(/[^0-9.\-]/g,''));
+      const correct = !isNaN(val) && Math.abs(val - stmtTableAns[id]) <= 0.02;
+      input.classList.remove('cell-correct','cell-wrong');
+      if(correct){ input.classList.add('cell-correct'); input.disabled = true; markSolved(id, 'stmteq'); }
+      else { input.classList.add('cell-wrong'); allCorrect = false; }
+    });
+    const fb = document.getElementById('fb-stmttable');
+    if(allCorrect){ fb.textContent = '✓ Table complete!'; fb.className = 'feedback good'; return; }
+    stmtTableAttempts++;
+    document.getElementById('hint-se').classList.add('show');
+    if(stmtTableAttempts >= 3){
+      fb.textContent = 'Here\'s one worked through for you below — use the same method for the rest.';
+      fb.className = 'feedback bad';
+      document.getElementById('scaffold-stmttable').classList.add('show');
+    } else {
+      fb.textContent = 'Not quite yet — check the hint and try again.';
+      fb.className = 'feedback bad';
     }
   }
   // plotting works independently of table-check state, using the same correct target points
@@ -2056,6 +1986,43 @@ m = 2</div>
       const fb = document.getElementById('fb-gradintercept-ex4');
       if(fb){ fb.textContent = '✓ Correct! m = −2, c = 3.'; fb.className = 'feedback good'; }
     }
+    // read-the-coordinates dual inputs (Section A extension)
+    const pointCoordAnswers = { rpP:[3,4], rpQ:[-6,3], rpR:[-4,-5], rpS:[5,-2], rpT:[0,6] };
+    Object.keys(pointCoordAnswers).forEach(id => {
+      if(state.answered[id]){
+        const [ax,ay] = pointCoordAnswers[id];
+        const xEl = document.getElementById(id+'-x-ans'), yEl = document.getElementById(id+'-y-ans');
+        if(xEl){ xEl.value = ax; xEl.disabled = true; xEl.classList.add('cell-correct'); }
+        if(yEl){ yEl.value = ay; yEl.disabled = true; yEl.classList.add('cell-correct'); }
+        const fb = document.getElementById('fb-'+id);
+        if(fb){ fb.textContent = '✓ Correct!'; fb.className = 'feedback good'; }
+      }
+    });
+    const huntCoordAnswers = { hnA:[2,7], hnB:[-4,5], hnC:[5,2], hnD:[-3,-4], hnE:[6,-3] };
+    Object.keys(huntCoordAnswers).forEach(id => {
+      if(state.answered[id]){
+        const [ax,ay] = huntCoordAnswers[id];
+        const xEl = document.getElementById(id+'-x-ans'), yEl = document.getElementById(id+'-y-ans');
+        if(xEl){ xEl.value = ax; xEl.disabled = true; xEl.classList.add('cell-correct'); }
+        if(yEl){ yEl.value = ay; yEl.disabled = true; yEl.classList.add('cell-correct'); }
+        const fb = document.getElementById('fb-'+id);
+        if(fb){ fb.textContent = '✓ Correct!'; fb.className = 'feedback good'; }
+      }
+    });
+    // statement-to-table cells
+    if(typeof stmtTableAns !== 'undefined'){
+      let stAllDone = true;
+      Object.keys(stmtTableAns).forEach(id => {
+        if(state.answered[id]){
+          const input = document.getElementById(id+'-ans');
+          if(input){ input.value = stmtTableAns[id]; input.disabled = true; input.classList.add('cell-correct'); }
+        } else { stAllDone = false; }
+      });
+      if(stAllDone){
+        const fb = document.getElementById('fb-stmttable');
+        if(fb){ fb.textContent = '✓ Table complete!'; fb.className = 'feedback good'; }
+      }
+    }
     // refresh chips + score displays
     chipGroups.forEach(g => {
       const chip = document.getElementById('chip-' + g.group);
@@ -2076,9 +2043,13 @@ m = 2</div>
     location.reload();
   }
   const resetBtn = document.getElementById('resetProgressBtn');
-  if(resetBtn) resetBtn.addEventListener('click', () => {
-    if(confirm('Reset all progress on this workbook? This can\'t be undone.')) resetProgress();
-  });
+  const resetModal = document.getElementById('resetModal');
+  if(resetBtn) resetBtn.addEventListener('click', () => { resetModal.classList.add('show'); });
+  const resetCancelBtn = document.getElementById('resetCancelBtn');
+  if(resetCancelBtn) resetCancelBtn.addEventListener('click', () => { resetModal.classList.remove('show'); });
+  const resetConfirmBtn = document.getElementById('resetConfirmBtn');
+  if(resetConfirmBtn) resetConfirmBtn.addEventListener('click', () => { resetModal.classList.remove('show'); resetProgress(); });
+  resetModal.addEventListener('click', (e) => { if(e.target === resetModal) resetModal.classList.remove('show'); });
 
   // ---------- Laser pointer ----------
   (function(){
